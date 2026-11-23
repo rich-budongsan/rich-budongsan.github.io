@@ -146,14 +146,16 @@ def collect(key, regions, months):
     print(f"API 조회 {calls}회 완료")
 
 
-def build(today):
+def build(today, regions):
     keep = set(months_back(KEEP_MONTHS, today))
+    labels = {r["code"]: r["label"] for r in regions}
     trades, seen = [], set()
     for f in sorted(RAW.glob("*/*.json")):
-        if f.stem not in keep:
+        if f.stem not in keep or f.parent.name not in labels:
             f.unlink()
             continue
         for t in json.loads(f.read_text(encoding="utf-8")):
+            t["r"] = labels[f.parent.name]
             sig = (t["k"], t["d"], t["a"], t["ar"], t["f"], t["dong"], t["c"])
             if sig in seen:
                 continue
@@ -170,6 +172,10 @@ def build(today):
     cutoff = (today - dt.timedelta(days=RECENT_DAYS)).isoformat()
     for k, ts in by_cx.items():
         ts.sort(key=lambda t: (t["d"], t["a"]))
+        top = {}
+        for t in ts:
+            if not t["c"]:
+                top[round(t["ar"])] = max(top.get(round(t["ar"]), 0), t["a"])
         best = {}
         rows = []
         for t in ts:
@@ -181,7 +187,7 @@ def build(today):
                 best[key] = max(best.get(key, 0), t["a"])
             rows.append([t["d"], t["a"], t["ar"], t["f"], t["dong"], t["c"], t["g"], hi])
             if t["d"] >= cutoff:
-                recent.append([k, t["n"], t["r"], t["u"], t["d"], t["a"], t["ar"], t["f"], t["c"], t["g"], hi])
+                recent.append([k, t["n"], t["r"], t["u"], t["d"], t["a"], t["ar"], t["f"], t["c"], t["g"], hi, top.get(key, 0)])
         rows.reverse()
         last = ts[-1]
         info = {"id": k, "n": last["n"], "r": last["r"], "u": last["u"], "j": last["j"], "by": last["by"], "t": rows}
@@ -215,7 +221,7 @@ def main():
     months = months_back(n, today)
     print(f"{len(regions)}개 지역 x {n}개월 조회 ({months[-1]}~{months[0]})")
     collect(key, regions, months)
-    build(today)
+    build(today, regions)
 
 
 if __name__ == "__main__":
