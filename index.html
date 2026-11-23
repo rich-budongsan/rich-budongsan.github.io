@@ -102,7 +102,7 @@ tr.cx td{opacity:.45}tr.cx .price{text-decoration:line-through}
  <div class="tels" id="tels"></div>
 </div></section>
 <div class="wrap foot">
- 자료: 국토교통부 아파트 매매 실거래가 (공공데이터포털 API), 매일 새벽 자동 업데이트 · 계약일 기준 · 면적은 전용면적<br>
+ 자료: 국토교통부 아파트 매매 실거래가 (공공데이터포털 API), 매일 새벽 자동 업데이트 · 계약일 기준 · 면적은 전용면적이고, 평형은 전용면적으로 계산한 대략적인 공급평형이라 단지마다 1평 정도 다를 수 있어요<br>
  <b>최고가</b> 표시는 이 사이트가 모은 기간(최근 약 2년) 안에서 같은 면적의 이전 거래보다 높은 거래예요. 계약이 해제된 거래는 줄을 그어 표시해요.<br>
  실거래 신고는 계약 후 30일 안에 하게 되어 있어서 최근 거래는 늦게 올라올 수 있어요.
 </div>
@@ -123,8 +123,8 @@ $('#tels').innerHTML=CONFIG.phones.map(p=>`<a href="tel:${p.replace(/-/g,'')}">$
 
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const won=a=>{const e=Math.floor(a/10000),r=a%10000;return (e?e+'억':'')+(r?(e?' ':'')+r.toLocaleString():'')||'0'};
-const py=ar=>Math.round(ar/3.3058);
-const area=ar=>`${Math.round(ar)}㎡<span class="sm"> · ${py(ar)}평</span>`;
+const py=ar=>Math.round(ar*1.335/3.3058); // 전용면적으로 추정한 공급평형
+const area=ar=>`${Math.round(ar)}㎡<span class="sm"> · ${py(ar)}평형</span>`;
 const md=d=>d.slice(2).replace(/-/g,'.');
 const norm=s=>s.replace(/\s/g,'').toLowerCase();
 const bucket=ar=>ar<60?'s':ar<=85?'m':'l';
@@ -144,9 +144,9 @@ function badges(c,g,hi){return (hi&&!c?'<span class="b hi">최고가</span>':'')
 function filters(){
   return `<div class="fil">
    <button class="chip ${state.area===''?'on':''}" data-a="">전체 면적</button>
-   <button class="chip ${state.area==='s'?'on':''}" data-a="s">60㎡ 미만</button>
-   <button class="chip ${state.area==='m'?'on':''}" data-a="m">60~85㎡</button>
-   <button class="chip ${state.area==='l'?'on':''}" data-a="l">85㎡ 초과</button>
+   <button class="chip ${state.area==='s'?'on':''}" data-a="s">60㎡ 미만 (~24평형)</button>
+   <button class="chip ${state.area==='m'?'on':''}" data-a="m">60~85㎡ (25~34평형)</button>
+   <button class="chip ${state.area==='l'?'on':''}" data-a="l">85㎡ 초과 (35평형~)</button>
    <button class="chip ${state.dir?'on':''}" data-t="dir">직거래 빼기</button>
    <button class="chip ${state.hi?'on':''}" data-t="hi">최고가만</button>
    <span class="cnt" id="cnt"></span></div>`
@@ -172,7 +172,7 @@ async function renderFind(){
   let c=IDX.c.filter(x=>(!r||x[2]===r)&&(!k||norm(x[1]).includes(k)||norm(x[3]).includes(k)));
   const rows=c.slice(0,state.shown).map(x=>`<tr><td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a></td>
    <td class="sm">${esc(x[2])} ${esc(x[3])}</td><td class="num sm hide-m">${x[4]}건</td>
-   <td class="sm num">최근 ${md(x[5])} · ${Math.round(x[7])}㎡</td><td class="num c-p"><span class="price">${won(x[6])}</span></td></tr>`).join('');
+   <td class="sm num">최근 ${md(x[5])} · ${Math.round(x[7])}㎡ · ${py(x[7])}평형</td><td class="num c-p"><span class="price">${won(x[6])}</span></td></tr>`).join('');
   app.innerHTML=tabs()+`<div class="fil"><span class="cnt" style="margin-left:0">${k||r?'검색 결과':'거래 많은 순'} ${c.length.toLocaleString()}곳</span></div>`+
    (c.length?`<table><thead><tr><th>단지</th><th>지역</th><th class="num hide-m">거래</th><th class="num">최근 거래</th><th class="num">최근 거래가</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">찾는 단지가 없어요. 이름을 짧게 입력해 보세요 (예: 자이)</div>')+
    (c.length>state.shown?'<button class="more" id="more">더 보기</button>':'');
@@ -189,7 +189,7 @@ async function renderDetail(id){
   CX.sel=def;
   app.innerHTML=`<button class="back" id="back">← 목록으로</button>
    <div class="dh"><div class="sm">${esc(CX.r)} ${esc(CX.u)} ${esc(CX.j)}${CX.by?` · ${CX.by}년 준공`:''}</div><h2>${esc(CX.n)}</h2></div>
-   <div class="fil" style="margin-top:14px" id="areas">${areas.map(a=>`<button class="chip" data-ar="${a}">${a}㎡ (${py(a)}평)</button>`).join('')}</div>
+   <div class="fil" style="margin-top:14px" id="areas">${areas.map(a=>`<button class="chip" data-ar="${a}">${a}㎡ (${py(a)}평형)</button>`).join('')}</div>
    <div class="stats" id="stats"></div><div class="fig"><svg id="chart"></svg></div><div id="trades"></div>`;
   drawArea();
 }
