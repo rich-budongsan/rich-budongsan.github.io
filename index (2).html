@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>리치부동산 실거래가</title>
+<meta name="description" content="서울·화성 아파트 실거래가를 바로 검색하세요. 국토교통부 실거래가 매일 업데이트 - 리치부동산">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFD21F;--ink:#1C1C1E;--sub:#6b6b70;--line:#ececec;--soft:#FFF7D1;--red:#E5383B}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.55 "Noto Sans KR","Noto Sans CJK KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;word-break:keep-all;overflow-x:clip}
+a{color:inherit}button,input,select{font:inherit;color:inherit}
+.top{background:var(--y)}
+.top .in{max-width:1440px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;text-decoration:none}
+.logo i{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--y);font-style:normal}
+.upd{font-size:13px;font-weight:500;opacity:.75}
+.layout{max-width:1440px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 440px}
+.main{padding:18px 20px 40px;border-right:1px solid var(--line)}
+.side{position:sticky;top:0;align-self:start;height:100vh;overflow:auto;background:#f6f6f7;padding:18px 18px 30px}
+.sbar{display:flex;gap:8px;flex-wrap:wrap}
+.sbox{flex:1 1 280px;display:flex;align-items:center;background:#f3f3f4;border-radius:14px;padding:0 14px;height:50px}
+.sbox input{flex:1;border:0;outline:0;font-size:17px;background:transparent;height:100%}
+.sbox svg{flex:none;margin-right:8px}
+#clear{border:0;background:#ddd;border-radius:50%;width:26px;height:26px;cursor:pointer;display:none}
+select{height:50px;border:2px solid var(--line);border-radius:14px;background:#fff;padding:0 12px;font-weight:700;cursor:pointer}
+.tabs{display:flex;gap:6px;margin:16px 0 10px;flex-wrap:wrap}
+.tab{border:0;background:#f3f3f3;border-radius:999px;padding:8px 18px;font-weight:700;cursor:pointer;min-height:42px}
+.tab.on{background:var(--ink);color:var(--y)}
+.fil{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;align-items:center}
+.chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 13px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px}
+.chip.on{border-color:var(--ink);background:var(--soft)}
+.cnt{margin-left:auto;font-size:13px;color:var(--sub)}
+table{width:100%;border-collapse:collapse}
+th{font-size:12px;color:var(--sub);font-weight:500;text-align:left;padding:9px 6px;border-bottom:2px solid var(--ink);white-space:nowrap}
+td{padding:11px 6px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr.sel td{background:#FFFBE6}
+.num{text-align:right;white-space:nowrap}
+.price{font-weight:900;font-size:16px;white-space:nowrap}
+.nm{font-weight:700;text-decoration:none}.nm:hover{text-decoration:underline}
+.sm{font-size:13px;color:var(--sub)}
+.up{color:var(--red);font-weight:700}
+.ck{width:26px;height:26px;border-radius:7px;border:2px solid #cfcfd3;background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+.ck.on{background:var(--ink);border-color:var(--ink);color:var(--y)}
+.ck svg{display:none}.ck.on svg{display:block}
+.b{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:2px;white-space:nowrap}
+.b.hi{background:var(--red);color:#fff}.b.dir{background:#eee;color:#555}.b.cx{background:#555;color:#fff}
+tr.cx td{opacity:.45}tr.cx .price{text-decoration:line-through}
+.empty{padding:50px 10px;text-align:center;color:var(--sub)}
+.more{display:block;margin:18px auto;border:2px solid var(--ink);background:#fff;border-radius:999px;padding:10px 26px;font-weight:700;cursor:pointer}
+/* detail */
+.back{border:0;background:none;font-weight:700;cursor:pointer;padding:8px 0;min-height:42px}
+.dh h2{margin:2px 0;font-size:clamp(24px,3vw,32px);font-weight:900;line-height:1.2}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.st{background:var(--soft);border-radius:14px;padding:12px 14px}
+.st small{display:block;font-size:12px;color:var(--sub)}.st b{font-size:clamp(18px,2.2vw,24px);font-weight:900;white-space:nowrap}
+.fig{position:relative;height:240px;border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
+.fig svg{position:absolute;inset:0;width:100%;height:100%}
+.addbtn{border:0;background:var(--ink);color:var(--y);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;min-height:40px}
+/* side board */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sh b{font-size:17px}
+.seg{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.seg button{border:2px solid var(--line);background:#fff;border-radius:10px;padding:5px 12px;font-weight:700;font-size:14px;cursor:pointer;min-height:36px}
+.seg button.on{background:var(--y);border-color:var(--y)}
+.ttl{width:100%;height:42px;border:2px solid var(--line);border-radius:10px;padding:0 10px;font-weight:700;margin-bottom:12px;background:#fff}
+#board{word-break:normal;background:#fff;color:var(--ink);padding:22px 20px 16px;border-radius:6px;box-shadow:0 2px 14px rgba(0,0,0,.08)}
+#board .bt{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:12px;gap:8px}
+#board .tag{display:inline-block;background:var(--y);font-size:10px;font-weight:900;padding:1px 6px;border-radius:4px}
+#board h3{margin:4px 0 0;font-size:21px;font-weight:900;line-height:1.25}
+#board .dt{font-size:11px;font-weight:700;white-space:nowrap;text-align:right}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px 14px}
+.bc .bn{font-weight:900;font-size:14px;line-height:1.3}
+.bc .bm{font-size:10px;color:var(--sub)}
+.bc .bp{font-size:22px;font-weight:900;letter-spacing:-.5px;margin-top:2px;white-space:nowrap}
+.bc .bs{font-size:10px;color:var(--sub)}
+.bc svg{width:100%;height:46px;display:block;margin:4px 0}
+.bx{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#f5f5f5;border-radius:6px;padding:5px 6px}
+.bx small{display:block;font-size:9px;color:var(--sub)}.bx b{font-size:11px;white-space:nowrap}
+.blist .br{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.blist .br:last-child{border-bottom:0}
+.blist .bp{font-size:19px;font-weight:900;white-space:nowrap;text-align:right}
+.blist .bn{font-weight:900;font-size:14px}.blist .bm{font-size:10px;color:var(--sub)}
+.bf{display:flex;justify-content:space-between;align-items:center;border-top:2px solid var(--ink);margin-top:16px;padding-top:10px;gap:8px}
+.bf .of{font-size:12px;font-weight:900}.bf .of small{display:block;font-size:9px;font-weight:500;color:var(--sub)}
+.bf .tel{font-size:16px;font-weight:900;white-space:nowrap;text-align:right;line-height:1.25}
+#board.dark{background:#1C1C1E;color:#fff}
+#board.dark .bt,#board.dark .bf{border-color:#fff}
+#board.dark .bm,#board.dark .bs,#board.dark .bf .of small{color:#aaa}
+#board.dark .blist .br{border-color:#333}
+#board.dark .bp{color:var(--y)}
+.bup{font-size:10px;color:var(--red);font-weight:700}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.acts button{border:0;border-radius:12px;padding:12px;font-weight:900;cursor:pointer;min-height:48px;background:var(--ink);color:#fff}
+.acts button.pri{background:var(--y);color:var(--ink)}
+.hint{font-size:13px;color:var(--sub);text-align:center;padding:40px 10px;background:#fff;border-radius:10px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.mbar{display:none}
+.office{background:var(--ink);color:#fff;padding:28px 0}
+.office .in{max-width:1440px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center;justify-content:space-between}
+.office h3{margin:0;font-size:20px;font-weight:900}.office h3 span{color:var(--y)}
+.office p{margin:4px 0 0;font-size:14px;opacity:.8}
+.tels{display:flex;gap:10px;flex-wrap:wrap}
+.tels a{background:var(--y);color:var(--ink);text-decoration:none;font-weight:900;font-size:19px;border-radius:12px;padding:9px 16px;white-space:nowrap}
+.foot{max-width:1440px;margin:0 auto;font-size:12px;color:var(--sub);padding:16px 20px 90px;line-height:1.7}
+@media(max-width:1000px){
+ .layout{grid-template-columns:1fr}.main{border-right:0}
+ .side{position:static;height:auto;overflow:visible}
+ .mbar{display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:8;background:var(--ink);color:#fff;border-radius:14px;padding:12px 16px;align-items:center;justify-content:space-between;font-weight:700;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+ .mbar button{border:0;background:var(--y);color:var(--ink);font-weight:900;border-radius:10px;padding:8px 14px;cursor:pointer}
+}
+@media(max-width:640px){
+ .hide-m{display:none}
+ thead{display:none}
+ table.lst,table.lst tbody,table.lst tr,table.lst td{display:block}
+ table.lst tr{display:grid;grid-template-columns:34px 1fr auto;padding:10px 0;border-bottom:1px solid var(--line)}
+ table.lst td{border:0;padding:1px 0;background:none!important}
+ table.lst td.hide-m{display:none}
+ table.lst tr.sel{background:#FFFBE6}
+ table.lst td.c-k{grid-row:1/4}
+ table.lst td.c-p{grid-column:3;grid-row:1/3;align-self:center}
+ .stats{grid-template-columns:1fr 1fr}.st:last-child{grid-column:1/-1}
+ .upd{font-size:11px;max-width:90px;text-align:right;line-height:1.3}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+ <a class="logo" href="#"><i>R</i>리치부동산 실거래가</a><span class="upd" id="upd"></span>
+</div></header>
+
+<div class="layout">
+ <main class="main">
+  <div class="sbar">
+   <label class="sbox"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1C1C1E" stroke-width="2.6"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+    <input id="q" type="search" placeholder="단지 · 동 이름 (예: 봉담자이, 대치동)" autocomplete="off" aria-label="단지 검색">
+    <button id="clear" aria-label="지우기">✕</button></label>
+   <select id="reg" aria-label="지역"><option value="">전체 지역</option></select>
+  </div>
+  <div id="app"></div>
+ </main>
+
+ <aside class="side" id="side">
+  <div class="sh"><b>담은 거래 <span id="ncount">0</span></b><button class="chip" id="reset">비우기</button></div>
+  <div class="seg" id="styles"><button data-s="card" class="on">카드</button><button data-s="list">목록</button><button data-s="dark">다크</button></div>
+  <input class="ttl" id="ttl" aria-label="제목" placeholder="제목">
+  <div id="boardWrap"><div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6건)</div></div>
+  <div class="acts"><button class="pri" id="save">이미지 저장</button><button id="copy">글 복사 (카톡·블로그)</button></div>
+ </aside>
+</div>
+
+<div class="mbar" id="mbar"><span>담은 거래 <b id="mcount">0</b></span><button id="mgo">그림 보기</button></div>
+<div class="toast" id="toast"></div>
+
+<section class="office"><div class="in">
+ <div><h3>궁금한 시세는 <span>리치부동산</span>에 물어보세요</h3><p id="addr"></p></div>
+ <div class="tels" id="tels"></div>
+</div></section>
+<div class="foot">
+ 자료: 국토교통부 아파트 매매 실거래가 (공공데이터포털 API), 매일 새벽 자동 업데이트 · 계약일 기준 · 면적은 전용면적<br>
+ <b>최고가</b>와 <b>최고가 대비</b>는 이 사이트가 모은 기간(최근 약 2년) 안에서 같은 면적 거래를 기준으로 해요. 계약이 해제된 거래는 줄을 그어 표시해요.<br>
+ 실거래 신고는 계약 후 30일 안에 하게 되어 있어서 최근 거래는 늦게 올라올 수 있어요.
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+{
+const CONFIG={
+  office:"리치부동산",
+  owner:"리치김소장",
+  address:"화성시 삼봉안길 30, 자이프라이드시티 단지내상가 101호 · 오전 10시~오후 7시 30분 (일요일 휴무)",
+  phones:["031-294-8009","010-4394-8600"],
+  site:"https://rich-budongsan.github.io"
+};
+const MAXSEL=6;
+const $=s=>document.querySelector(s);
+const app=$('#app'),q=$('#q'),reg=$('#reg'),clr=$('#clear');
+let IDX=null,REC=null;
+const state={tab:'new',area:'',dir:true,hi:false,days:45,shown:60,style:'card'};
+let SEL=[];try{SEL=JSON.parse(localStorage.getItem('sel')||'[]')}catch(e){}
+let customTitle='';
+
+$('#addr').textContent=CONFIG.address;
+$('#tels').innerHTML=CONFIG.phones.map(p=>`<a href="tel:${p.replace(/-/g,'')}">${p}</a>`).join('');
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const won=a=>{const e=Math.floor(a/10000),r=a%10000;return (e?e+'억':'')+(r?(e?' ':'')+r.toLocaleString():'')||'0'};
+const m2=ar=>Math.round(ar)+'㎡';
+const md=d=>d.slice(5).replace('-','.');
+const ymd=d=>d.slice(2).replace(/-/g,'.');
+const mdY=d=>d.slice(0,4)==String(new Date().getFullYear())?md(d):ymd(d);
+const norm=s=>s.replace(/\s/g,'').toLowerCase();
+const bucket=ar=>ar<60?'s':ar<=85?'m':'l';
+const today=new Date();const iso=d=>d.toISOString().slice(0,10);
+const daysAgo=n=>iso(new Date(today.getTime()-n*864e5));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+const CK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M4 12l5 5L20 6"/></svg>';
+
+async function getJSON(u){const r=await fetch(u,{cache:'no-cache'});if(!r.ok)throw new Error(r.status);return r.json()}
+const CXC={};const getCx=id=>CXC[id]||(CXC[id]=getJSON(`data/c/${encodeURIComponent(id)}.json`).catch(e=>{delete CXC[id];throw e}));
+async function loadIndex(){if(!IDX){IDX=await getJSON('data/index.json');fillRegions();if(!$('#upd').textContent)$('#upd').textContent=IDX.updated+' 업데이트'}return IDX}
+function fillRegions(){
+  const rs=[...new Set(IDX.c.map(c=>c[2]))].sort((a,b)=>(b.startsWith('화성')-a.startsWith('화성'))||a.localeCompare(b,'ko'));
+  const cur=reg.value;
+  reg.innerHTML='<option value="">전체 지역</option>'+rs.map(r=>`<option>${esc(r)}</option>`).join('');
+  let s=cur;try{s=s||localStorage.getItem('reg')}catch(e){}
+  if(s&&rs.includes(s))reg.value=s;
+}
+function notReady(){app.innerHTML=`<div class="empty"><b>데이터를 준비하고 있어요</b><br>첫 자동 수집이 끝나면 여기에 실거래가가 나타나요.</div>`}
+function badges(c,g,hi){return (hi&&!c?'<span class="b hi">신고가</span>':'')+(g?'<span class="b dir">직거래</span>':'')+(c?'<span class="b cx">해제</span>':'')}
+const keyOf=p=>[p.id,p.ar,p.d||'',p.a||''].join('|');
+const isPicked=p=>SEL.some(s=>keyOf(s)===keyOf(p));
+const isSel=id=>SEL.some(s=>s.id===id);
+function saveSel(){try{localStorage.setItem('sel',JSON.stringify(SEL))}catch(e){}$('#ncount').textContent=SEL.length;$('#mcount').textContent=SEL.length}
+function toggle(item){
+  const i=SEL.findIndex(s=>keyOf(s)===keyOf(item));
+  if(i>=0)SEL.splice(i,1);
+  else{if(SEL.length>=MAXSEL){toast(`한 번에 ${MAXSEL}건까지 담을 수 있어요`);return false}SEL.push(item)}
+  saveSel();renderBoard();return true;
+}
+const tabs=()=>`<div class="tabs"><button class="tab ${state.tab==='new'?'on':''}" data-tab="new">새 거래</button><button class="tab ${state.tab==='find'?'on':''}" data-tab="find">단지 찾기</button></div>`;
+
+/* 새 거래 */
+function renderNew(){
+  const r=reg.value,from=daysAgo(state.days);
+  const t=REC.t.filter(x=>x[4]>=from&&(!r||x[2]===r)&&(!state.area||bucket(x[6])===state.area)&&(!state.dir||!x[9])&&(!state.hi||(x[10]&&!x[8])));
+  const ch=(k,v,l)=>`<button class="chip ${state[k]===v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`;
+  const rows=t.slice(0,state.shown).map(x=>{const pct=x[11]&&!x[8]?x[5]/x[11]*100:0;const s=isPicked({id:x[0],ar:Math.round(x[6]),d:x[4],a:x[5]});
+   return `<tr class="${x[8]?'cx':''} ${s?'sel':''}">
+   <td class="c-k">${x[8]?'':`<button class="ck ${s?'on':''}" data-pick='${esc(JSON.stringify({id:x[0],ar:Math.round(x[6]),d:x[4],a:x[5]}))}' aria-label="담기">${CK}</button>`}</td>
+   <td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a>${badges(x[8],x[9],x[10])}<div class="sm">${esc(x[2].replace('서울 ','').replace('화성시 ',''))} ${esc(x[3])} · ${m2(x[6])} · ${x[7]}층</div></td>
+   <td class="num sm hide-m">${md(x[4])}</td>
+   <td class="num c-p"><span class="price">${won(x[5])}</span><div class="sm">${pct?(pct>100.05?`<span class="up">▲${(x[5]-x[11]).toLocaleString()}</span>`:pct.toFixed(1)+'%'):''}<span class="hide-d" style="display:none"> ${md(x[4])}</span></div></td></tr>`}).join('');
+  app.innerHTML=tabs()+`<div class="fil">${ch('days',7,'7일')}${ch('days',15,'15일')}${ch('days',30,'30일')}${ch('days',45,'45일')}</div>
+   <div class="fil">${ch('area','','전체 면적')}${ch('area','s','60㎡ 미만')}${ch('area','m','60~85㎡')}${ch('area','l','85㎡ 초과')}
+   <button class="chip ${state.dir?'on':''}" data-t="dir">직거래 빼기</button><button class="chip ${state.hi?'on':''}" data-t="hi">신고가만</button><span class="cnt">${t.length.toLocaleString()}건</span></div>`+
+   (t.length?`<table class="lst"><thead><tr><th></th><th>단지</th><th class="num hide-m">계약일</th><th class="num">거래가 · 최고가 대비</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">조건에 맞는 거래가 없어요</div>')+
+   (t.length>state.shown?'<button class="more" id="more">더 보기</button>':'');
+  if(innerWidth<=640)app.querySelectorAll('.hide-d').forEach(e=>e.style.display='inline');
+}
+
+/* 단지 찾기 */
+async function renderFind(){
+  try{await loadIndex()}catch(e){return notReady()}
+  const k=norm(q.value),r=reg.value;
+  const c=IDX.c.filter(x=>(!r||x[2]===r)&&(!k||norm(x[1]).includes(k)||norm(x[3]).includes(k)));
+  const rows=c.slice(0,state.shown).map(x=>{const s=isPicked({id:x[0],ar:Math.round(x[7])});return `<tr class="${s?'sel':''}">
+   <td class="c-k"><button class="ck ${s?'on':''}" data-pick='${esc(JSON.stringify({id:x[0],ar:Math.round(x[7])}))}' aria-label="담기">${CK}</button></td>
+   <td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a><div class="sm">${esc(x[2])} ${esc(x[3])} · 거래 ${x[4]}건</div></td>
+   <td class="num sm hide-m">최근 ${ymd(x[5])}</td><td class="num c-p"><span class="price">${won(x[6])}</span><div class="sm">${m2(x[7])}</div></td></tr>`}).join('');
+  app.innerHTML=tabs()+`<div class="fil"><span class="cnt" style="margin-left:0">${k||r?'검색 결과':'거래 많은 순'} ${c.length.toLocaleString()}곳</span></div>`+
+   (c.length?`<table class="lst"><thead><tr><th></th><th>단지</th><th class="num hide-m">최근 거래</th><th class="num">최근 거래가</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">찾는 단지가 없어요. 이름을 짧게 입력해 보세요 (예: 자이)</div>')+
+   (c.length>state.shown?'<button class="more" id="more">더 보기</button>':'');
+}
+
+/* 단지 상세 */
+let CX=null;
+async function renderDetail(id){
+  app.innerHTML='<div class="empty">불러오는 중…</div>';
+  try{CX=await getCx(id)}catch(e){app.innerHTML='<div class="empty">단지 정보를 찾지 못했어요</div>';return}
+  const areas=[...new Set(CX.t.map(t=>Math.round(t[2])))].sort((a,b)=>a-b);
+  const cnt=a=>CX.t.filter(t=>Math.round(t[2])===a).length;
+  CX.sel=areas.reduce((m,a)=>cnt(a)>cnt(m)?a:m,areas[0]);
+  app.innerHTML=`<button class="back" id="back">← 목록으로</button>
+   <div class="dh"><div class="sm">${esc(CX.r)} ${esc(CX.u)} ${esc(CX.j)}${CX.by?` · ${CX.by}년 준공`:''}</div><h2>${esc(CX.n)}</h2></div>
+   <div class="fil" style="margin-top:12px" id="areas">${areas.map(a=>`<button class="chip" data-ar="${a}">${a}㎡</button>`).join('')}<button class="addbtn" id="addcx"></button></div>
+   <div class="stats" id="stats"></div><div class="fig"><svg id="chart"></svg></div><div id="trades"></div>`;
+  drawArea();
+}
+function drawArea(){
+  const a=CX.sel,ts=CX.t.filter(t=>Math.round(t[2])===a),ok=ts.filter(t=>!t[5]);
+  document.querySelectorAll('#areas .chip').forEach(b=>b.classList.toggle('on',+b.dataset.ar===a));
+  const last=ok[0];CX.last=last?{id:CX.id,ar:a,d:last[0],a:last[1]}:null;
+  $('#addcx').textContent=CX.last&&isPicked(CX.last)?`✓ ${a}㎡ 최근 거래 담김`:`+ ${a}㎡ 최근 거래 담기`;
+  const _l=0,max=ok.reduce((m,t)=>t[1]>m[1]?t:m,ok[0]||ts[0]);
+  $('#stats').innerHTML=`<div class="st"><small>최근 거래가</small><b>${last?won(last[1]):'-'}</b><div class="sm">${last?ymd(last[0])+' · '+last[3]+'층':''}</div></div>
+   <div class="st"><small>수집 기간 최고가</small><b>${max?won(max[1]):'-'}</b><div class="sm">${max?ymd(max[0]):''}</div></div>
+   <div class="st"><small>거래 건수</small><b>${ts.length}건</b><div class="sm">해제 ${ts.length-ok.length}건 포함</div></div>`;
+  $('#trades').innerHTML=`<p class="sm" style="margin:0 0 6px">☐를 눌러 원하는 거래를 골라 담을 수 있어요. 다른 달 거래나 다른 평형도 섞어서 담아보세요.</p><table><thead><tr><th></th><th>계약일</th><th>면적</th><th class="num">층</th><th class="hide-m">동</th><th class="num">거래가</th></tr></thead><tbody>${ts.map(t=>{const pk={id:CX.id,ar:a,d:t[0],a:t[1]},on=!t[5]&&isPicked(pk);return `<tr class="${t[5]?'cx':''} ${on?'sel':''}">
+   <td style="width:40px">${t[5]?'':`<button class="ck ${on?'on':''}" data-pick='${esc(JSON.stringify(pk))}' aria-label="담기">${CK}</button>`}</td><td>${ymd(t[0])}${badges(t[5],t[6],t[7])}</td><td>${m2(t[2])}</td><td class="num">${t[3]}층</td><td class="hide-m sm">${esc(t[4])||'-'}</td><td class="num"><span class="price">${won(t[1])}</span></td></tr>`}).join('')}</tbody></table>`;
+  chart(ok.slice().reverse());
+}
+function chart(pts){
+  const s=$('#chart');if(!s)return;const W=s.clientWidth,H=s.clientHeight;if(!W||!pts.length){if(s)s.innerHTML='';return}
+  const N=W<520,P={l:N?10:62,r:N?10:16,t:18,b:30};
+  const tx=pts.map(p=>Date.parse(p[0])),ys=pts.map(p=>p[1]);
+  let x0=Math.min(...tx),x1=Math.max(...tx);if(x0===x1){x0-=864e5*15;x1+=864e5*15}
+  let y0=Math.min(...ys),y1=Math.max(...ys);const pad=(y1-y0)*.15||y1*.05;y0-=pad;y1+=pad;
+  const X=t=>P.l+(t-x0)/(x1-x0)*(W-P.l-P.r),Y=v=>P.t+(1-(v-y0)/(y1-y0))*(H-P.t-P.b);
+  let g='';
+  for(let i=0;i<=3;i++){const v=y0+(y1-y0)*i/3,y=Y(v);g+=`<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="#eee"/><text x="${N?P.l+2:P.l-8}" y="${N?y-4:y+4}" text-anchor="${N?'start':'end'}" font-size="11" fill="#888">${won(Math.round(v/100)*100)}</text>`}
+  new Set(tx.map(t=>new Date(t).getFullYear())).forEach(yr=>{const t=Date.parse(yr+'-01-01');if(t>x0&&t<x1)g+=`<line x1="${X(t)}" x2="${X(t)}" y1="${P.t}" y2="${H-P.b}" stroke="#ddd" stroke-dasharray="3 3"/><text x="${X(t)+4}" y="${H-10}" font-size="11" fill="#888">${yr}</text>`});
+  g+=`<path d="${pts.map((p,i)=>(i?'L':'M')+X(tx[i]).toFixed(1)+','+Y(p[1]).toFixed(1)).join('')}" fill="none" stroke="#1C1C1E" stroke-width="1.5" opacity=".35"/>`;
+  g+=pts.map((p,i)=>`<circle cx="${X(tx[i])}" cy="${Y(p[1])}" r="${p[7]?5:4}" fill="${p[7]?'#E5383B':'#FFD21F'}" stroke="#1C1C1E" stroke-width="1.5"><title>${ymd(p[0])} ${won(p[1])} ${p[3]}층</title></circle>`).join('');
+  s.innerHTML=g;
+}
+const ro=new ResizeObserver(()=>{if(CX&&location.hash.startsWith('#c'))chart(CX.t.filter(t=>Math.round(t[2])===CX.sel&&!t[5]).reverse())});
+ro.observe(document.body);
+
+/* 보드 */
+function summarize(cx,item){
+  const key=item.ar,ts=cx.t.filter(t=>Math.round(t[2])===key&&!t[5]);
+  if(!ts.length)return null;
+  let cur=item.d?ts.find(t=>t[0]===item.d&&t[1]===item.a):null;cur=cur||ts[0];
+  const max=ts.reduce((m,t)=>t[1]>m[1]?t:m,ts[0]);
+  const prevMax=ts.filter(t=>t[0]<cur[0]).reduce((m,t)=>Math.max(m,t[1]),0);
+  const cnt3=ts.filter(t=>t[0]>=daysAgo(91)).length;
+  const months={};ts.forEach(t=>{const k=t[0].slice(0,7);months[k]=Math.max(months[k]||0,t[1])});
+  const spark=Object.keys(months).sort().map(k=>[k,months[k]]);
+  return {cx,cur,max,prevMax,cnt3,spark,key};
+}
+function spark(sp,dark){
+  if(sp.length<2)return '<svg viewBox="0 0 200 46"></svg>';
+  const ys=sp.map(s=>s[1]),lo=Math.min(...ys),hi=Math.max(...ys),rg=hi-lo||1;
+  const X=i=>i/(sp.length-1)*196+2,Y=v=>40-(v-lo)/rg*34;
+  const d=sp.map((s,i)=>(i?'L':'M')+X(i).toFixed(1)+','+Y(s[1]).toFixed(1)).join('');
+  return `<svg viewBox="0 0 200 46" preserveAspectRatio="none"><path d="${d}L198,46L2,46Z" fill="${dark?'#3a3520':'#FFF1B0'}"/><path d="${d}" fill="none" stroke="${dark?'#FFD21F':'#1C1C1E'}" stroke-width="1.6"/><circle cx="${X(sp.length-1)}" cy="${Y(sp[sp.length-1][1])}" r="3" fill="${dark?'#FFD21F':'#1C1C1E'}"/></svg>`;
+}
+function autoTitle(list){
+  const rs=[...new Set(list.map(x=>x.cx.r))];
+  const n=new Set(list.map(x=>x.cx.id)).size;
+  return `${rs.length===1?rs[0]:'아파트 실거래'} ${n===list.length?n+'곳 한눈에':n+'곳 실거래 '+list.length+'건'}`;
+}
+let LAST=[];
+async function renderBoard(){
+  saveSel();
+  const wrap=$('#boardWrap');
+  if(!SEL.length){LAST=[];wrap.innerHTML='<div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6건)</div>';$('#ttl').value='';return}
+  let list=[];
+  for(const it of SEL){try{const s=summarize(await getCx(it.id),it);if(s)list.push(s)}catch(e){}}
+  LAST=list;
+  const title=customTitle||autoTitle(list);$('#ttl').value=title;
+  const d=new Date(),dt=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  const dark=state.style==='dark';
+  const meta=s=>`${esc(s.cx.u)}${s.cx.by?` · ${s.cx.by}년`:''}`;
+  const up=s=>s.prevMax&&s.cur[1]>s.prevMax?`<span class="bup">▲${(s.cur[1]-s.prevMax).toLocaleString()} 신고가</span>`:'';
+  const body=state.style==='card'
+   ?`<div class="bgrid">${list.map(s=>`<div class="bc"><div class="bn">${esc(s.cx.n)}</div><div class="bm">${meta(s)}</div>
+      <div class="bp">${won(s.cur[1])}</div><div class="bs">${s.key}㎡ · ${s.cur[3]}층 · ${mdY(s.cur[0])} 계약 ${up(s)}</div>${spark(s.spark,false)}
+      <div class="bx"><div><small>최고가</small><b>${won(s.max[1])}</b></div><div><small>최고가 대비</small><b>${(s.cur[1]/s.max[1]*100).toFixed(1)}%</b></div><div><small>석 달 거래</small><b>${s.cnt3}건</b></div></div></div>`).join('')}</div>`
+   :`<div class="blist">${list.map(s=>`<div class="br"><div><div class="bn">${esc(s.cx.n)}</div><div class="bm">${meta(s)} · ${s.key}㎡ · ${s.cur[3]}층 · ${mdY(s.cur[0])} 계약</div></div><div><div class="bp">${won(s.cur[1])}</div><div style="text-align:right">${up(s)||`<span class="bm">최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%</span>`}</div></div></div>`).join('')}</div>`;
+  wrap.innerHTML=`<div id="board" class="${dark?'dark':''}"><div class="bt"><div><span class="tag" style="${dark?'color:#1C1C1E':''}">아파트 실거래가</span><h3>${esc(title)}</h3></div><div class="dt">${dt}<br><span style="font-weight:500;opacity:.7">기준</span></div></div>
+   ${body}
+   <div class="bf"><div class="of">${esc(CONFIG.office)} · ${esc(CONFIG.owner)}<small>${esc(CONFIG.site.replace('https://',''))}</small></div><div class="tel">${CONFIG.phones.map(esc).join('<br>')}</div></div></div>`;
+  // 목록 체크 표시 갱신
+  document.querySelectorAll('[data-pick]').forEach(b=>{const s=isPicked(JSON.parse(b.dataset.pick));b.classList.toggle('on',s);b.closest('tr')?.classList.toggle('sel',s)});
+  if($('#addcx')&&CX&&CX.last)$('#addcx').textContent=isPicked(CX.last)?`✓ ${CX.sel}㎡ 최근 거래 담김`:`+ ${CX.sel}㎡ 최근 거래 담기`;
+}
+function boardText(){
+  if(!LAST.length)return '';
+  const d=new Date();
+  return `[${$('#ttl').value}] ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} 기준\n\n`+
+   LAST.map(s=>`▪ ${s.cx.n} ${s.key}㎡ ${s.cur[3]}층\n   ${won(s.cur[1])} (${mdY(s.cur[0])} 계약${s.prevMax&&s.cur[1]>s.prevMax?', 신고가':''}) · 최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%`).join('\n')+
+   `\n\n${CONFIG.office} ${CONFIG.phones.join(' / ')}\n실거래가 검색: ${CONFIG.site}`;
+}
+$('#copy').addEventListener('click',async()=>{
+  const t=boardText();if(!t)return toast('먼저 단지를 담아주세요');
+  try{await navigator.clipboard.writeText(t);toast('글을 복사했어요')}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('글을 복사했어요')}catch(_){toast('복사하지 못했어요')}a.remove()}
+});
+$('#save').addEventListener('click',async()=>{
+  const b=$('#board');if(!b)return toast('먼저 단지를 담아주세요');
+  if(!window.html2canvas)return toast('잠시 후 다시 눌러주세요');
+  toast('이미지를 만드는 중…');
+  try{
+    await document.fonts.ready;
+    const c=await html2canvas(b,{scale:Math.max(2,1080/b.offsetWidth),backgroundColor:null,useCORS:true});
+    const blob=await new Promise(r=>c.toBlob(r,'image/png'));
+    const name=`${$('#ttl').value.replace(/[\\/:*?"<>|]/g,'')}.png`;
+    const file=new File([blob],name,{type:'image/png'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})&&matchMedia('(pointer:coarse)').matches){await navigator.share({files:[file],title:name});return}
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);toast('이미지를 저장했어요');
+  }catch(e){if(e.name!=='AbortError')toast('저장하지 못했어요')}
+});
+$('#styles').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;state.style=b.dataset.s;document.querySelectorAll('#styles button').forEach(x=>x.classList.toggle('on',x===b));renderBoard()});
+$('#ttl').addEventListener('input',()=>{customTitle=$('#ttl').value;const h=$('#board h3');if(h)h.textContent=customTitle});
+$('#reset').addEventListener('click',()=>{SEL=[];customTitle='';renderBoard();route()});
+$('#mgo').addEventListener('click',()=>$('#side').scrollIntoView({behavior:'smooth'}));
+
+/* 화면 전환 */
+async function route(){
+  const h=location.hash;
+  if(h.startsWith('#c')&&h.length>2){window.scrollTo(0,0);return renderDetail(decodeURIComponent(h.slice(2)))}
+  CX=null;
+  if(state.tab==='find'||q.value.trim())return renderFind();
+  if(!REC){try{REC=await getJSON('data/recent.json');$('#upd').textContent=REC.updated+' 업데이트'}catch(e){return notReady()}}
+  renderNew();
+}
+const leaveDetail=()=>{if(location.hash.startsWith('#c'))history.pushState('','',location.pathname)};
+let timer;
+q.addEventListener('input',()=>{clr.style.display=q.value?'block':'none';state.shown=60;if(q.value.trim())state.tab='find';clearTimeout(timer);timer=setTimeout(()=>{leaveDetail();route()},120)});
+clr.addEventListener('click',e=>{e.preventDefault();q.value='';clr.style.display='none';state.tab='new';route();q.focus()});
+reg.addEventListener('change',()=>{try{localStorage.setItem('reg',reg.value)}catch(e){}state.shown=60;leaveDetail();route()});
+app.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.pick){toggle(JSON.parse(b.dataset.pick))}
+  else if(b.dataset.tab){state.tab=b.dataset.tab;state.shown=60;if(b.dataset.tab==='new'){q.value='';clr.style.display='none'}route()}
+  else if(b.dataset.k){const v=b.dataset.v;state[b.dataset.k]=isNaN(+v)||v===''?v:+v;state.shown=60;renderNew()}
+  else if(b.dataset.t){state[b.dataset.t]=!state[b.dataset.t];state.shown=60;renderNew()}
+  else if(b.id==='more'){state.shown+=60;state.tab==='find'||q.value.trim()?renderFind():renderNew()}
+  else if(b.id==='back'){history.length>1?history.back():(location.hash='')}
+  else if(b.id==='addcx'){if(CX.last)toggle(CX.last)}
+  else if(b.dataset.ar){CX.sel=+b.dataset.ar;drawArea()}
+});
+window.addEventListener('hashchange',route);
+loadIndex().catch(()=>{});
+saveSel();route();renderBoard();
+}
+</script>
+</body>
+</html>
