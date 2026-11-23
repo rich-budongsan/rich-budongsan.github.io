@@ -78,6 +78,40 @@ body.brief .bmode{background:var(--ink);color:var(--y)}
 .card .cf span{background:var(--soft);border-radius:8px;padding:3px 10px;font-weight:700;font-size:15px}
 .card .co{font-size:15px;color:#333;margin-top:8px}
 .card .cm{font-size:14px;color:var(--sub);margin-top:6px}
+#plans{display:none;background:#fafafa;border-radius:14px;padding:14px;margin-bottom:14px}
+#plans.on{display:block}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.slot{border:2px dashed #cfcfd3;border-radius:12px;background:#fff;padding:8px;text-align:center;cursor:pointer;position:relative;min-height:150px;display:flex;flex-direction:column;justify-content:space-between}
+.slot.has{border-style:solid;border-color:#bbb}.slot.over{border-color:var(--ink);background:var(--soft)}
+.slot img{width:100%;height:100px;object-fit:contain}
+.slot b{font-size:14px}.slot .x{position:absolute;top:4px;right:4px;border:0;background:#eee;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:12px}
+.slot .ph{height:100px;display:grid;place-items:center;color:#aaa;font-size:13px}
+.card .cplan{width:100%;height:220px;object-fit:contain;background:#fafafa;border-radius:12px;margin-top:10px}
+#printArea{display:none}
+@page{size:A4;margin:9mm}
+@media print{
+ body>*:not(#printArea){display:none!important}
+ #printArea{display:block!important}
+ body{background:#fff}
+}
+.pcard{height:135mm;box-sizing:border-box;border:1.6px solid #1C1C1E;border-radius:4mm;padding:5mm 6mm;display:grid;grid-template-columns:1.4fr 1fr;gap:5mm;margin-bottom:6mm;break-inside:avoid;font-size:11pt;color:#1C1C1E;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pcard:nth-child(2n){break-after:page;margin-bottom:0}
+.pcard .pl{display:flex;flex-direction:column;min-height:0}
+.pcard .pl img{width:100%;flex:1;min-height:0;object-fit:contain}
+.pcard .pl .none{flex:1;border:1px dashed #bbb;border-radius:3mm;display:grid;place-items:center;color:#999;font-size:10pt}
+.pcard .ph{display:flex;justify-content:space-between;align-items:center;font-size:9pt;margin-bottom:2mm}
+.pcard .ph span:first-child{background:#FFD21F;font-weight:900;padding:.5mm 2mm;border-radius:1.5mm}
+.pcard .pn{font-size:10pt;color:#555}
+.pcard .pd{font-size:18pt;font-weight:900;line-height:1.2}
+.pcard .pp{font-size:20pt;font-weight:900;margin:1.5mm 0 2.5mm}
+.pcard .pp small{font-size:10pt;margin-right:1.5mm}
+.pcard table{width:100%;border-collapse:collapse;margin:0}
+.pcard td{font-size:9.5pt;padding:1.2mm 0;border-bottom:.3mm solid #ddd;vertical-align:top;display:table-cell}
+.pcard td:first-child{width:16mm;color:#666;font-weight:700}
+.pcard>div:last-child{display:flex;flex-direction:column;min-height:0}
+.pcard .memo{margin-top:3mm;font-size:9pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
+.pcard .memo div{border-bottom:.3mm solid #999;height:9mm;display:flex;align-items:flex-end;color:#888}
+.pcard .pf{font-size:8.5pt;color:#555;margin-top:2mm;display:flex;justify-content:space-between}
 @media(max-width:760px){
  thead{display:none}
  table,tbody,tr,td{display:block}
@@ -100,13 +134,16 @@ body.brief .bmode{background:var(--ink);color:var(--y)}
 <div class="wrap">
  <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
  <div id="top"></div>
+ <div id="plans"></div>
  <div id="filters" class="filters"></div>
  <div id="results"></div>
  <p class="note">엑셀 내용은 이 컴퓨터의 브라우저 안에만 저장되고 인터넷에 올라가지 않아요. 다른 컴퓨터나 휴대폰에서 보려면 거기서도 엑셀을 한 번 올려주세요.<br>
  층이 숫자로 적힌 매물은 전체 층수를 3등분해서 저층·중층·고층으로 나눠요. 예: 35층 건물이면 1~11층 저층, 12~23층 중층, 24층 이상 고층.<br>
- 카톡용 글 복사에는 부동산 칸과 확인사항·기타 칸이 들어가지 않아요.</p>
+ 카톡용 글 복사에는 부동산 칸과 확인사항·기타 칸이 들어가지 않아요.<br>도면도 이 컴퓨터에만 저장돼요. 임장카드는 브리핑 모드를 켜고 인쇄하면 손님용(저·중·고층, 메모 없음), 끄고 인쇄하면 사장님용(정확한 층, 메모 포함)으로 나와요.</p>
 </div>
 <div class="toast" id="toast"></div>
+<div id="printArea"></div>
+<input type="file" id="planfile" accept="image/*" multiple hidden>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
@@ -123,7 +160,60 @@ const store={get(k,d){try{const v=localStorage.getItem('office_'+k);return v?JSO
 let DB=store.get('db',null);           // {file, at, sheets:[{name,on,rows:[...]}]}
 const F={cx:[],kind:[],py:[],ty:[],dir:[],fl:[],pr:[],min:'',max:'',kw:'',noinv:false,dong:[]};
 let SORT='p',PICK=new Set(),CARD=false;
-function cardHtml(x){return `<div class="card"><div class="cn">${esc(x.cx)}</div><div class="cd">${esc(x.dong)} · ${esc(x.type.replace(/㎡.*/,'㎡'))}</div><div class="cp"><small>${esc(x.kind)}</small>${priceTxt(x)}</div><div class="cf"><span>${esc(x.fl)}${x.band?' ('+x.band+')':''}</span><span>${esc(x.dir)}</span>${x.mv?`<span>${esc(mvTxt(x.mv))}</span>`:''}</div>${x.opt?`<div class="co">${esc(x.opt)}</div>`:''}${isInv(x)?'<div class="cm">투자 · 세입자 있는 매물</div>':''}</div>`}
+/* 도면: 이 컴퓨터의 IndexedDB에만 저장 */
+let PLANS=new Map(),PLANSLOT=null;
+const idb=()=>new Promise((res,rej)=>{const r=indexedDB.open('rich_office',1);r.onupgradeneeded=()=>r.result.createObjectStore('plans');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+async function planTx(mode,fn){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('plans',mode),st=t.objectStore('plans');const out=fn(st);t.oncomplete=()=>res(out&&out.result);t.onerror=()=>rej(t.error)})}
+async function loadPlans(){try{const db=await idb();await new Promise(res=>{const t=db.transaction('plans','readonly'),st=t.objectStore('plans'),c=st.openCursor();c.onsuccess=()=>{const cur=c.result;if(cur){PLANS.set(cur.key,cur.value);cur.continue()}else res()};c.onerror=res})}catch(e){}}
+const cxKey=cx=>cx.includes('자이')?'자이':cx.includes('힐스')?'힐스':cx;
+const planKey=x=>`${cxKey(x.cx)}|${x.area}${x.ty}`;
+function planFor(x){const k=planKey(x);if(PLANS.has(k))return PLANS.get(k);const b=`${cxKey(x.cx)}|${x.area}${x.base}`;return PLANS.get(b)||null}
+function shrink(file){return new Promise((res,rej)=>{const img=new Image();img.onload=()=>{const m=1400,r=Math.min(1,m/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);const g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,c.width,c.height);g.drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(img.src);res(c.toDataURL('image/jpeg',.9))};img.onerror=()=>rej(new Error('이미지를 읽지 못했어요'));img.src=URL.createObjectURL(file)})}
+function guessKey(name){ // "자이_59A.jpg", "자이82C1.jpg", "힐스117C-1.jpg", "힐스150.jpg"
+  const cx=/자이/.test(name)?'자이':/힐스/.test(name)?'힐스':'';
+  const n=name.replace(/\.[a-z]+$/i,'').toUpperCase();const m=n.match(/(\d{2,3})\s*([A-Z]?)\s*-?\s*(\d?)(?!\d)/);
+  if(!cx||!m)return null;
+  const num=+m[1],ty=m[2]+(m[2]?m[3]:'');
+  const rows=DB?DB.sheets.flatMap(s=>s.rows).filter(r=>cxKey(r.cx)===cx):[];
+  const hit=rows.find(r=>r.supply===num&&r.ty===ty)||rows.find(r=>r.supply===num);
+  return `${cx}|${hit?hit.area:num}${ty}`;
+}
+async function savePlan(key,file){const url=await shrink(file);PLANS.set(key,url);await planTx('readwrite',st=>st.put(url,key))}
+async function addPlanFiles(files,slot){
+  let ok=0,miss=[];
+  for(const f of files){if(!/^image\//.test(f.type))continue;const k=slot||guessKey(f.name);if(!k){miss.push(f.name);continue}try{await savePlan(k,f);ok++}catch(e){miss.push(f.name)}slot=null}
+  toast(ok?`도면 ${ok}장을 넣었어요`+(miss.length?` (${miss.length}장은 칸을 눌러 직접 넣어주세요)`:''):'파일 이름으로 타입을 못 찾았어요. 칸을 눌러 넣어주세요');
+  renderPlans();renderResults();
+}
+function planSlots(){const m=new Map();all().forEach(x=>{if(x.area){const k=planKey(x);if(!m.has(k))m.set(k,{k,label:`${cxKey(x.cx)} ${x.area}${x.ty}`,sub:x.type,n:0});m.get(k).n++}});
+  return [...m.values()].sort((a,b)=>a.k.localeCompare(b.k,'ko',{numeric:true}))}
+function renderPlans(){
+  const el=$('#plans');if(!el.classList.contains('on'))return;
+  const sl=planSlots();const have=sl.filter(s=>PLANS.has(s.k)).length;
+  el.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"><b>도면 관리</b><span class="sm">${have}/${sl.length} 타입 등록 · 칸을 누르거나 이미지를 끌어다 놓으세요. 파일 이름을 "자이_59A.png", "힐스_100C.png"처럼 지으면 여러 장을 한꺼번에 넣을 수 있어요. C1처럼 도면이 없는 타입은 C 도면을 대신 써요.</span><span style="flex:1"></span><button class="btn" id="planbulk">여러 장 한꺼번에 넣기</button><button class="btn" id="planclose">닫기</button></div>
+   <div class="pgrid">${sl.map(s=>{const u=PLANS.get(s.k);return `<div class="slot ${u?'has':''}" data-slot="${esc(s.k)}">${u?`<button class="x" data-pdel="${esc(s.k)}" aria-label="지우기">✕</button><img src="${u}" alt="">`:'<div class="ph">도면 넣기</div>'}<div><b>${esc(s.label)}</b><div class="sm">${esc(s.sub)} · 매물 ${s.n}</div></div></div>`}).join('')}</div>`;
+  el.querySelectorAll('.slot').forEach(d=>{
+    d.addEventListener('click',e=>{if(e.target.closest('[data-pdel]'))return;PLANSLOT=d.dataset.slot;$('#planfile').click()});
+    d.addEventListener('dragover',e=>{e.preventDefault();d.classList.add('over')});d.addEventListener('dragleave',()=>d.classList.remove('over'));
+    d.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();d.classList.remove('over');addPlanFiles([...e.dataTransfer.files].slice(0,1),d.dataset.slot)});
+  });
+  el.ondragover=e=>e.preventDefault();
+  el.ondrop=e=>{e.preventDefault();e.stopPropagation();addPlanFiles([...e.dataTransfer.files],null)};
+}
+/* 임장카드 */
+function printCards(){
+  const list=filtered().filter(x=>PICK.has(x.id));
+  if(!list.length)return toast('☐로 인쇄할 매물을 먼저 골라주세요');
+  const brief=document.body.classList.contains('brief');const d=new Date(),ds=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+  $('#printArea').innerHTML=list.map(x=>{const u=planFor(x);return `<div class="pcard"><div class="pl"><div class="ph"><span>리치부동산 임장카드</span><span>${ds}</span></div>${u?`<img src="${u}" alt="">`:'<div class="none">도면 없음</div>'}</div>
+   <div><div class="pn">${esc(x.cx)}</div><div class="pd">${esc(x.dong)} · ${esc(x.type.replace(/㎡.*/,'㎡'))}</div><div class="pp"><small>${esc(x.kind)}</small>${priceTxt(x)}</div>
+   <table><tr><td>층</td><td>${brief?(x.band?x.band+'층':esc(x.fl)):esc(x.fl)+(x.band?' ('+x.band+')':'')}</td></tr><tr><td>향</td><td>${esc(x.dir)}</td></tr><tr><td>입주</td><td>${esc(mvTxt(x.mv))||'-'}</td></tr><tr><td>옵션</td><td>${esc(x.opt)||'-'}</td></tr>${!brief&&x.etc?`<tr><td>메모</td><td style="white-space:pre-line">${esc(x.etc)}</td></tr>`:''}</table>
+   <div class="memo"><div>뷰 · 채광</div><div>집 상태</div><div>소음 · 기타</div></div>
+   <div class="pf"><span>${esc(OFFICE.name)}</span><span>${OFFICE.phones.map(esc).join(' · ')}</span></div></div></div>`}).join('');
+  const imgs=[...$('#printArea').querySelectorAll('img')];
+  Promise.all(imgs.map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>{try{window.print()}catch(e){toast('인쇄 창을 열지 못했어요')}});
+}
+function cardHtml(x){return `<div class="card"><div class="cn">${esc(x.cx)}</div><div class="cd">${esc(x.dong)} · ${esc(x.type.replace(/㎡.*/,'㎡'))}</div><div class="cp"><small>${esc(x.kind)}</small>${priceTxt(x)}</div><div class="cf"><span>${esc(x.fl)}${x.band?' ('+x.band+')':''}</span><span>${esc(x.dir)}</span>${x.mv?`<span>${esc(mvTxt(x.mv))}</span>`:''}</div>${x.opt?`<div class="co">${esc(x.opt)}</div>`:''}${isInv(x)?'<div class="cm">투자 · 세입자 있는 매물</div>':''}${planFor(x)?`<img class="cplan" src="${planFor(x)}" alt="도면">`:''}</div>`}
 
 /* ---------- 엑셀 읽기 ---------- */
 const clean=v=>v==null?'':String(v).replace(/\s+/g,' ').trim();
@@ -200,7 +290,7 @@ function renderTop(){
   const d=new Date(DB.at);
   $('#top').innerHTML=`<div class="bar" id="drop"><b>${esc(DB.file)}</b><span class="sm">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 올림</span>
    <span class="sheets">${DB.sheets.map((s,i)=>`<label><input type="checkbox" data-sh="${i}" ${s.on?'checked':''}>${esc(s.name)} <span class="sm">${s.rows.length}</span></label>`).join('')}</span>
-   <span class="sp"></span><button class="btn dark" id="up">새 엑셀 올리기</button></div>`;
+   <span class="sp"></span><button class="btn" id="planbtn">도면 관리</button><button class="btn dark" id="up">새 엑셀 올리기</button></div>`;
   bindDrop($('#drop'));
 }
 function bindDrop(el){
@@ -254,7 +344,7 @@ function renderResults(){
   const list=CARD?r.filter(x=>PICK.has(x.id)):r;
   $('#results').innerHTML=`<div class="resh"><h2>${r.length}건</h2><span class="sm">${PICK.size?`고른 매물 ${PICK.size}건`:'☐로 손님께 보낼 매물을 고를 수 있어요'}</span><span class="sp"></span>
     <select id="sort" aria-label="정렬"><option value="p">가격 낮은순</option><option value="ph">가격 높은순</option><option value="f">층 높은순</option><option value="d">동 순서</option></select>
-    <button class="bmode" id="bmode2">손님 브리핑 모드</button><button class="btn" id="pickall">보이는 매물 모두 고르기</button><button class="btn" id="cardv">${CARD?'목록으로 보기':'고른 매물 크게 보기'}</button><button class="btn dark" id="copy">카톡용 글 복사</button></div>`+
+    <button class="bmode" id="bmode2">손님 브리핑 모드</button><button class="btn" id="pickall">보이는 매물 모두 고르기</button><button class="btn" id="cardv">${CARD?'목록으로 보기':'고른 매물 크게 보기'}</button><button class="btn" id="printc">임장카드 인쇄</button><button class="btn dark" id="copy">카톡용 글 복사</button></div>`+
    (CARD?(list.length?`<div class="cards">${list.map(cardHtml).join('')}</div>`:'<div class="empty">☐로 매물을 먼저 골라주세요</div>'):r.length?`<table><thead><tr><th></th><th>단지 · 동 · 타입</th><th>층 · 향</th><th class="num">가격</th><th>옵션</th><th>입주<span class="int"> · 메모</span></th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">조건에 맞는 매물이 없어요. 조건을 하나씩 빼보세요.</div>');
   $('#sort').value=SORT;
 }
@@ -270,11 +360,17 @@ function copyText(){
 
 /* ---------- 이벤트 ---------- */
 $('#file').addEventListener('change',e=>{onFile(e.target.files[0]);e.target.value=''});
+$('#planfile').addEventListener('change',e=>{addPlanFiles([...e.target.files],PLANSLOT);PLANSLOT=null;e.target.value=''});
 document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='up')return $('#file').click();
   if(b.id==='bmode'||b.id==='bmode2'){document.body.classList.toggle('brief');store.set('brief',document.body.classList.contains('brief'));return}
   if(b.id==='cardv'){CARD=!CARD;renderResults();return}
+  if(b.id==='planbtn'){$('#plans').classList.toggle('on');renderPlans();return}
+  if(b.id==='planclose'){$('#plans').classList.remove('on');return}
+  if(b.id==='planbulk'){PLANSLOT=null;$('#planfile').click();return}
+  if(b.dataset.pdel){const k=b.dataset.pdel;PLANS.delete(k);planTx('readwrite',st=>st.delete(k)).catch(()=>{});renderPlans();renderResults();return}
+  if(b.id==='printc'){printCards();return}
   if(b.dataset.f){const a=F[b.dataset.f],v=b.dataset.v,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);renderFilters();renderResults();return}
   if(b.dataset.quick==='midup'){F.fl=['중','고'];renderFilters();renderResults();return}
   if(b.dataset.t){F[b.dataset.t]=!F[b.dataset.t];renderFilters();renderResults();return}
@@ -290,10 +386,10 @@ document.addEventListener('change',e=>{
 });
 let tm;document.addEventListener('input',e=>{if(['min','max','kw'].includes(e.target.id)){F[e.target.id]=e.target.value;clearTimeout(tm);tm=setTimeout(renderResults,150)}});
 document.addEventListener('dragover',e=>e.preventDefault());
-document.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0])});
+document.addEventListener('drop',e=>{e.preventDefault();const fs=[...e.dataTransfer.files];if(!fs.length)return;if(fs.every(f=>/^image\//.test(f.type)))addPlanFiles(fs,null);else onFile(fs.find(f=>/\.xls/i.test(f.name))||fs[0])});
 if(store.get('brief',false))document.body.classList.add('brief');
 if(/embed=1/.test(location.search)){document.body.classList.add('embed');const post=()=>parent.postMessage({officeH:document.documentElement.scrollHeight},location.origin);new ResizeObserver(post).observe(document.body);}
-render();
+render();loadPlans().then(()=>{renderResults();renderPlans()});
 }
 </script>
 </body>
