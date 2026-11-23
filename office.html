@@ -63,6 +63,7 @@ tr.sel td{background:#FFFBE6}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
 .toast.on{opacity:1}
 .note{font-size:12px;color:var(--sub);margin-top:22px;line-height:1.7}
+body.embed .top{display:none}body.embed .wrap{padding:6px 0 30px}
 body.brief .bar,body.brief .int,body.brief .note,body.brief .fr.dongs{display:none!important}
 body.brief td{font-size:17px}body.brief .price{font-size:21px}body.brief .opt{font-size:15px}
 .bmode{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:6px 14px;font-weight:900;font-size:14px;cursor:pointer;min-height:38px}
@@ -92,8 +93,8 @@ body.brief .bmode{background:var(--ink);color:var(--y)}
 </head>
 <body>
 <header class="top"><div class="in">
- <a class="logo" href="office.html"><i>R</i>우리 매물</a>
- <nav class="nav" style="display:flex;gap:8px;align-items:center"><button class="bmode" id="bmode">손님 브리핑 모드</button><a href="./">실거래가 보기</a></nav>
+ <div style="display:flex;align-items:center;gap:12px"><a class="logo" href="./"><i>R</i>리치부동산 실거래가</a><span style="font-weight:900;font-size:14px;background:#1C1C1E;color:#FFD21F;border-radius:999px;padding:7px 16px;white-space:nowrap">우리 매물</span></div>
+ <nav class="nav" style="display:flex;gap:8px;align-items:center"><button class="bmode" id="bmode">손님 브리핑 모드</button></nav>
 </div></header>
 
 <div class="wrap">
@@ -253,7 +254,7 @@ function renderResults(){
   const list=CARD?r.filter(x=>PICK.has(x.id)):r;
   $('#results').innerHTML=`<div class="resh"><h2>${r.length}건</h2><span class="sm">${PICK.size?`고른 매물 ${PICK.size}건`:'☐로 손님께 보낼 매물을 고를 수 있어요'}</span><span class="sp"></span>
     <select id="sort" aria-label="정렬"><option value="p">가격 낮은순</option><option value="ph">가격 높은순</option><option value="f">층 높은순</option><option value="d">동 순서</option></select>
-    <button class="btn" id="pickall">보이는 매물 모두 고르기</button><button class="btn" id="cardv">${CARD?'목록으로 보기':'고른 매물 크게 보기'}</button><button class="btn dark" id="copy">카톡용 글 복사</button></div>`+
+    <button class="bmode" id="bmode2">손님 브리핑 모드</button><button class="btn" id="pickall">보이는 매물 모두 고르기</button><button class="btn" id="cardv">${CARD?'목록으로 보기':'고른 매물 크게 보기'}</button><button class="btn dark" id="copy">카톡용 글 복사</button></div>`+
    (CARD?(list.length?`<div class="cards">${list.map(cardHtml).join('')}</div>`:'<div class="empty">☐로 매물을 먼저 골라주세요</div>'):r.length?`<table><thead><tr><th></th><th>단지 · 동 · 타입</th><th>층 · 향</th><th class="num">가격</th><th>옵션</th><th>입주<span class="int"> · 메모</span></th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">조건에 맞는 매물이 없어요. 조건을 하나씩 빼보세요.</div>');
   $('#sort').value=SORT;
 }
@@ -272,7 +273,7 @@ $('#file').addEventListener('change',e=>{onFile(e.target.files[0]);e.target.valu
 document.addEventListener('click',async e=>{
   const b=e.target.closest('button');if(!b)return;
   if(b.id==='up')return $('#file').click();
-  if(b.id==='bmode'){document.body.classList.toggle('brief');store.set('brief',document.body.classList.contains('brief'));return}
+  if(b.id==='bmode'||b.id==='bmode2'){document.body.classList.toggle('brief');store.set('brief',document.body.classList.contains('brief'));return}
   if(b.id==='cardv'){CARD=!CARD;renderResults();return}
   if(b.dataset.f){const a=F[b.dataset.f],v=b.dataset.v,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);renderFilters();renderResults();return}
   if(b.dataset.quick==='midup'){F.fl=['중','고'];renderFilters();renderResults();return}
@@ -291,6 +292,7 @@ let tm;document.addEventListener('input',e=>{if(['min','max','kw'].includes(e.ta
 document.addEventListener('dragover',e=>e.preventDefault());
 document.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0])});
 if(store.get('brief',false))document.body.classList.add('brief');
+if(/embed=1/.test(location.search)){document.body.classList.add('embed');const post=()=>parent.postMessage({officeH:document.documentElement.scrollHeight},location.origin);new ResizeObserver(post).observe(document.body);}
 render();
 }
 </script>
