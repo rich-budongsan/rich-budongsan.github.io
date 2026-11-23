@@ -58,6 +58,7 @@ tr.cx td{opacity:.45}tr.cx .price{text-decoration:line-through}
 .st small{display:block;font-size:12px;color:var(--sub)}.st b{font-size:clamp(18px,2.2vw,24px);font-weight:900;white-space:nowrap}
 .fig{position:relative;height:240px;border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
 .fig svg{position:absolute;inset:0;width:100%;height:100%}
+.mh td{background:#f4f4f5;font-size:14px;padding:9px 8px;border-bottom:1px solid #e3e3e5}
 .addbtn{border:0;background:var(--ink);color:var(--y);border-radius:999px;padding:8px 16px;font-weight:700;cursor:pointer;min-height:40px}
 /* side board */
 .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -179,7 +180,7 @@ const MAXSEL=6;
 const $=s=>document.querySelector(s);
 const app=$('#app'),q=$('#q'),reg=$('#reg'),clr=$('#clear');
 let IDX=null,REC=null;
-const state={tab:'new',area:'',dir:true,hi:false,days:45,shown:60,style:'card'};
+const state={sort:'d',tab:'new',area:'',dir:true,hi:false,days:45,shown:60,style:'card'};
 let SEL=[];try{SEL=JSON.parse(localStorage.getItem('sel')||'[]')}catch(e){}
 let customTitle='';
 
@@ -227,6 +228,7 @@ const tabs=()=>`<div class="tabs"><button class="tab ${state.tab==='new'?'on':''
 function renderNew(){
   const r=reg.value,from=daysAgo(state.days);
   const t=REC.t.filter(x=>x[4]>=from&&(!r||x[2]===r)&&(!state.area||bucket(x[6])===state.area)&&(!state.dir||!x[9])&&(!state.hi||(x[10]&&!x[8])));
+  if(state.sort==='p')t.sort((x,y)=>y[5]-x[5]);else if(state.sort==='a')t.sort((x,y)=>x[6]-y[6]||(y[4]>x[4]?1:-1));
   const ch=(k,v,l)=>`<button class="chip ${state[k]===v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`;
   const rows=t.slice(0,state.shown).map(x=>{const pct=x[11]&&!x[8]?x[5]/x[11]*100:0;const s=isPicked({id:x[0],ar:Math.round(x[6]),d:x[4],a:x[5]});
    return `<tr class="${x[8]?'cx':''} ${s?'sel':''}">
@@ -234,7 +236,7 @@ function renderNew(){
    <td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a>${badges(x[8],x[9],x[10])}<div class="sm">${esc(x[2].replace('서울 ','').replace('화성시 ',''))} ${esc(x[3])} · ${m2(x[6])} · ${x[7]}층</div></td>
    <td class="num sm hide-m">${md(x[4])}</td>
    <td class="num c-p"><span class="price">${won(x[5])}</span><div class="sm">${pct?(pct>100.05?`<span class="up">▲${(x[5]-x[11]).toLocaleString()}</span>`:pct.toFixed(1)+'%'):''}<span class="hide-d" style="display:none"> ${md(x[4])}</span></div></td></tr>`}).join('');
-  app.innerHTML=tabs()+`<div class="fil">${ch('days',7,'7일')}${ch('days',15,'15일')}${ch('days',30,'30일')}${ch('days',45,'45일')}</div>
+  app.innerHTML=tabs()+`<div class="fil">${ch('days',7,'7일')}${ch('days',15,'15일')}${ch('days',30,'30일')}${ch('days',45,'45일')}<span style="width:10px"></span>${ch('sort','d','최신순')}${ch('sort','a','평형순')}${ch('sort','p','높은 가격순')}</div>
    <div class="fil">${ch('area','','전체 면적')}${ch('area','s','60㎡ 미만')}${ch('area','m','60~85㎡')}${ch('area','l','85㎡ 초과')}
    <button class="chip ${state.dir?'on':''}" data-t="dir">직거래 빼기</button><button class="chip ${state.hi?'on':''}" data-t="hi">신고가만</button><span class="cnt">${t.length.toLocaleString()}건</span></div>`+
    (t.length?`<table class="lst"><thead><tr><th></th><th>단지</th><th class="num hide-m">계약일</th><th class="num">거래가 · 최고가 대비</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">조건에 맞는 거래가 없어요</div>')+
@@ -279,9 +281,37 @@ function drawArea(){
   $('#stats').innerHTML=`<div class="st"><small>최근 거래가</small><b>${last?won(last[1]):'-'}</b><div class="sm">${last?ymd(last[0])+' · '+last[3]+'층':''}</div></div>
    <div class="st"><small>수집 기간 최고가</small><b>${max?won(max[1]):'-'}</b><div class="sm">${max?ymd(max[0]):''}</div></div>
    <div class="st"><small>거래 건수</small><b>${ts.length}건</b><div class="sm">해제 ${ts.length-ok.length}건 포함</div></div>`;
-  $('#trades').innerHTML=`<p class="sm" style="margin:0 0 6px">☐를 눌러 원하는 거래를 골라 담을 수 있어요. 다른 달 거래나 다른 평형도 섞어서 담아보세요.</p><table><thead><tr><th></th><th>계약일</th><th>면적</th><th class="num">층</th><th class="hide-m">동</th><th class="num">거래가</th></tr></thead><tbody>${ts.map(t=>{const pk={id:CX.id,ar:a,d:t[0],a:t[1]},on=!t[5]&&isPicked(pk);return `<tr class="${t[5]?'cx':''} ${on?'sel':''}">
-   <td style="width:40px">${t[5]?'':`<button class="ck ${on?'on':''}" data-pick='${esc(JSON.stringify(pk))}' aria-label="담기">${CK}</button>`}</td><td>${ymd(t[0])}${badges(t[5],t[6],t[7])}</td><td>${m2(t[2])}</td><td class="num">${t[3]}층</td><td class="hide-m sm">${esc(t[4])||'-'}</td><td class="num"><span class="price">${won(t[1])}</span></td></tr>`}).join('')}</tbody></table>`;
+  renderTrades();
   chart(ok.slice().reverse());
+}
+function tradeRow(t){
+  const pk={id:CX.id,ar:Math.round(t[2]),d:t[0],a:t[1]},on=!t[5]&&isPicked(pk);
+  return `<tr class="${t[5]?'cx':''} ${on?'sel':''}"><td style="width:40px">${t[5]?'':`<button class="ck ${on?'on':''}" data-pick='${esc(JSON.stringify(pk))}' aria-label="담기">${CK}</button>`}</td>
+   <td>${ymd(t[0])}${badges(t[5],t[6],t[7])}</td><td>${m2(t[2])}</td><td class="num">${t[3]}층</td><td class="hide-m sm">${esc(t[4])||'-'}</td><td class="num"><span class="price">${won(t[1])}</span></td></tr>`;
+}
+const avg=a=>a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length/100)*100:0;
+function renderTrades(){
+  const v=CX.view||'month',a=CX.sel;
+  const ts=CX.t.filter(t=>CX.all||Math.round(t[2])===a);
+  const head=`<thead><tr><th></th><th>계약일</th><th>면적</th><th class="num">층</th><th class="hide-m">동</th><th class="num">거래가</th></tr></thead>`;
+  const vb=(k,l)=>`<button class="chip ${v===k?'on':''}" data-view="${k}">${l}</button>`;
+  let bar=`<div class="fil">${vb('month','월별')}${vb('trade','거래별')}${vb('area','평형별')}`+
+   (v!=='area'?`<button class="chip ${CX.all?'on':''}" data-allar="1">${CX.all?'전체 평형 보는 중':'전체 평형 함께 보기'}</button>`:'')+`</div>`;
+  let body='';
+  if(v==='trade'){
+    body=`<table>${head}<tbody>${ts.map(tradeRow).join('')}</tbody></table>`;
+  }else if(v==='month'){
+    const g={};ts.forEach(t=>(g[t[0].slice(0,7)]=g[t[0].slice(0,7)]||[]).push(t));
+    body=`<table>${head}<tbody>${Object.keys(g).sort().reverse().map(m=>{const r=g[m],ok=r.filter(t=>!t[5]).map(t=>t[1]);
+      return `<tr class="mh"><td colspan="6"><b>${m.slice(0,4)}년 ${+m.slice(5)}월</b> <span class="sm">· ${r.length}건${ok.length?` · 최고 ${won(Math.max(...ok))} · 최저 ${won(Math.min(...ok))} · 평균 ${won(avg(ok))}`:''}</span></td></tr>`+r.map(tradeRow).join('')}).join('')}</tbody></table>`;
+  }else{
+    const ars=[...new Set(CX.t.map(t=>Math.round(t[2])))].sort((x,y)=>x-y),from=daysAgo(91);
+    body=`<table><thead><tr><th>면적</th><th class="num">거래</th><th class="num">최근 거래가</th><th class="num hide-m">최고가</th><th class="num hide-m">최근 3개월 평균</th><th></th></tr></thead><tbody>${ars.map(x=>{
+      const r=CX.t.filter(t=>Math.round(t[2])===x&&!t[5]),l=r[0],mx=r.reduce((m,t)=>t[1]>m[1]?t:m,r[0]),a3=avg(r.filter(t=>t[0]>=from).map(t=>t[1]));
+      return `<tr class="${x===a?'sel':''}"><td><b>${x}㎡</b></td><td class="num">${r.length}건</td><td class="num"><span class="price">${l?won(l[1]):'-'}</span><div class="sm">${l?ymd(l[0])+' · '+l[3]+'층':''}</div></td>
+       <td class="num hide-m">${mx?won(mx[1]):'-'}<div class="sm">${mx?ymd(mx[0]):''}</div></td><td class="num hide-m">${a3?won(a3):'-'}</td><td class="num"><button class="chip" data-arv="${x}">보기</button></td></tr>`}).join('')}</tbody></table>`;
+  }
+  $('#trades').innerHTML=bar+`<p class="sm" style="margin:0 0 6px">☐를 눌러 원하는 거래를 골라 담을 수 있어요. 다른 달 거래나 다른 평형도 섞어서 담아보세요.</p>`+body;
 }
 function chart(pts){
   const s=$('#chart');if(!s)return;const W=s.clientWidth,H=s.clientHeight;if(!W||!pts.length){if(s)s.innerHTML='';return}
@@ -403,6 +433,9 @@ app.addEventListener('click',e=>{
   else if(b.id==='back'){history.length>1?history.back():(location.hash='')}
   else if(b.id==='addcx'){if(CX.last)toggle(CX.last)}
   else if(b.dataset.ar){CX.sel=+b.dataset.ar;drawArea()}
+  else if(b.dataset.view){CX.view=b.dataset.view;renderTrades()}
+  else if(b.dataset.allar){CX.all=!CX.all;renderTrades()}
+  else if(b.dataset.arv){CX.sel=+b.dataset.arv;CX.view='month';drawArea();$('#areas').scrollIntoView({behavior:'smooth',block:'start'})}
 });
 window.addEventListener('hashchange',route);
 loadIndex().catch(()=>{});
