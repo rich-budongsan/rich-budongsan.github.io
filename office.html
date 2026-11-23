@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>리치부동산 우리 매물</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--y:#FFD21F;--ink:#1C1C1E;--sub:#6b6b70;--line:#ececec;--soft:#FFF7D1;--red:#E5383B}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:#fff;color:var(--ink);font:16px/1.55 "Noto Sans KR","Noto Sans CJK KR","Malgun Gothic",sans-serif;word-break:keep-all;overflow-x:clip}
+button,input,select{font:inherit;color:inherit}
+.top{background:var(--y)}
+.top .in{max-width:1440px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;text-decoration:none;color:inherit}
+.logo i{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--y);font-style:normal}
+.nav a{font-weight:700;font-size:14px;color:inherit;text-decoration:none;border:2px solid var(--ink);border-radius:999px;padding:6px 14px}
+.wrap{max-width:1440px;margin:0 auto;padding:18px 20px 60px}
+.drop{border:3px dashed #d4d4d8;border-radius:18px;padding:34px 20px;text-align:center;background:#fafafa;cursor:pointer}
+.drop.over{border-color:var(--ink);background:var(--soft)}
+.drop b{font-size:20px;display:block;margin-bottom:6px}
+.drop .sm{font-size:14px;color:var(--sub)}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;background:var(--soft);border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:14px}
+.bar b{font-size:15px}
+.bar .sp{flex:1}
+.btn{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px}
+.btn.dark{background:var(--ink);color:var(--y)}
+.sheets{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sheets label{font-size:13px;display:flex;gap:4px;align-items:center;background:#fff;border-radius:8px;padding:3px 8px}
+.filters{display:grid;gap:8px;margin-bottom:14px}
+.fr{display:grid;grid-template-columns:68px 1fr;gap:8px;align-items:start}
+.fr>span{font-size:13px;font-weight:700;color:var(--sub);padding-top:9px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:2px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-weight:700;font-size:14px;cursor:pointer;min-height:38px;white-space:nowrap}
+.chip.on{border-color:var(--ink);background:var(--y)}
+.chip small{font-weight:500;color:var(--sub);margin-left:3px}
+.chip.on small{color:var(--ink)}
+.chip.q{border-style:dashed}
+.rng{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:14px}
+.rng input{width:88px;height:38px;border:2px solid var(--line);border-radius:10px;padding:0 8px;text-align:right}
+.kw{text-align:left!important;height:40px;border:2px solid var(--line);border-radius:10px;padding:0 12px;flex:1 1 240px;max-width:380px}
+.resh{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:12px;margin-top:6px}
+.resh h2{margin:0;font-size:24px;font-weight:900}
+.resh select{height:40px;border:2px solid var(--line);border-radius:10px;padding:0 10px;font-weight:700;background:#fff}
+.resh .sp{flex:1}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{font-size:12px;color:var(--sub);font-weight:500;text-align:left;padding:8px 6px;border-bottom:1px solid var(--ink);white-space:nowrap}
+td{padding:11px 6px;border-bottom:1px solid var(--line);vertical-align:top;font-size:15px}
+tr.sel td{background:#FFFBE6}
+.num{text-align:right;white-space:nowrap}
+.price{font-weight:900;font-size:17px;white-space:nowrap}
+.cx{font-weight:900}
+.sm{font-size:13px;color:var(--sub)}
+.opt{font-size:13px;color:#444;max-width:360px;white-space:pre-line}
+.tg{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 6px;margin:2px 4px 0 0;background:#eee;color:#555;white-space:nowrap}
+.tg.inv{background:#E8F0FE;color:#2456c4}.tg.now{background:#E7F7EC;color:#1d7a3c}
+.ck{width:26px;height:26px;border-radius:7px;border:2px solid #cfcfd3;background:#fff;cursor:pointer;display:grid;place-items:center;padding:0}
+.ck.on{background:var(--ink);border-color:var(--ink);color:var(--y)}
+.ck svg{display:none}.ck.on svg{display:block}
+.empty{padding:50px 10px;text-align:center;color:var(--sub)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+.note{font-size:12px;color:var(--sub);margin-top:22px;line-height:1.7}
+body.brief .bar,body.brief .int,body.brief .note,body.brief .fr.dongs{display:none!important}
+body.brief td{font-size:17px}body.brief .price{font-size:21px}body.brief .opt{font-size:15px}
+.bmode{border:2px solid var(--ink);background:#fff;border-radius:999px;padding:6px 14px;font-weight:900;font-size:14px;cursor:pointer;min-height:38px}
+body.brief .bmode{background:var(--ink);color:var(--y)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:14px}
+.card{border:3px solid var(--ink);border-radius:20px;padding:20px 22px;background:#fff}
+.card .cn{font-size:15px;font-weight:700;color:var(--sub)}
+.card .cd{font-size:26px;font-weight:900;line-height:1.2;margin-top:2px}
+.card .cp{font-size:34px;font-weight:900;margin:10px 0 6px;letter-spacing:-.5px}
+.card .cp small{font-size:16px;font-weight:700;margin-right:6px}
+.card .cf{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.card .cf span{background:var(--soft);border-radius:8px;padding:3px 10px;font-weight:700;font-size:15px}
+.card .co{font-size:15px;color:#333;margin-top:8px}
+.card .cm{font-size:14px;color:var(--sub);margin-top:6px}
+@media(max-width:760px){
+ thead{display:none}
+ table,tbody,tr,td{display:block}
+ tr{display:grid;grid-template-columns:34px 1fr auto;column-gap:8px;padding:12px 0;border-bottom:1px solid var(--line)}
+ td{border:0;padding:1px 0}
+ td.c-k{grid-row:1/6}
+ td.c-p{grid-column:3;grid-row:1/3;text-align:right}
+ td.c-o,td.c-m,td.c-x{grid-column:2/4}
+ .fr{grid-template-columns:1fr}.fr>span{padding-top:0}
+ .opt{max-width:none}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+ <a class="logo" href="office.html"><i>R</i>우리 매물</a>
+ <nav class="nav" style="display:flex;gap:8px;align-items:center"><button class="bmode" id="bmode">손님 브리핑 모드</button><a href="./">실거래가 보기</a></nav>
+</div></header>
+
+<div class="wrap">
+ <input type="file" id="file" accept=".xlsx,.xls,.xlsm" hidden>
+ <div id="top"></div>
+ <div id="filters" class="filters"></div>
+ <div id="results"></div>
+ <p class="note">엑셀 내용은 이 컴퓨터의 브라우저 안에만 저장되고 인터넷에 올라가지 않아요. 다른 컴퓨터나 휴대폰에서 보려면 거기서도 엑셀을 한 번 올려주세요.<br>
+ 층이 숫자로 적힌 매물은 전체 층수를 3등분해서 저층·중층·고층으로 나눠요. 예: 35층 건물이면 1~11층 저층, 12~23층 중층, 24층 이상 고층.<br>
+ 카톡용 글 복사에는 부동산 칸과 확인사항·기타 칸이 들어가지 않아요.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+{
+const OFFICE={name:"리치부동산",phones:["031-294-8009","010-4394-8600"]};
+const CX_NAMES=[["자이","봉담자이프라이드시티"],["힐스","힐스테이트봉담프라이드시티"]];
+const SKIP=/종료|실거래|브리핑|\(\d\)/;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const CK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4"><path d="M4 12l5 5L20 6"/></svg>';
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1800)}
+const store={get(k,d){try{const v=localStorage.getItem('office_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('office_'+k,JSON.stringify(v))}catch(e){toast('이 브라우저에는 저장이 안 돼요')}}};
+
+let DB=store.get('db',null);           // {file, at, sheets:[{name,on,rows:[...]}]}
+const F={cx:[],kind:[],py:[],ty:[],dir:[],fl:[],pr:[],min:'',max:'',kw:'',noinv:false,dong:[]};
+let SORT='p',PICK=new Set(),CARD=false;
+function cardHtml(x){return `<div class="card"><div class="cn">${esc(x.cx)}</div><div class="cd">${esc(x.dong)} · ${esc(x.type.replace(/㎡.*/,'㎡'))}</div><div class="cp"><small>${esc(x.kind)}</small>${priceTxt(x)}</div><div class="cf"><span>${esc(x.fl)}${x.band?' ('+x.band+')':''}</span><span>${esc(x.dir)}</span>${x.mv?`<span>${esc(mvTxt(x.mv))}</span>`:''}</div>${x.opt?`<div class="co">${esc(x.opt)}</div>`:''}${isInv(x)?'<div class="cm">투자 · 세입자 있는 매물</div>':''}</div>`}
+
+/* ---------- 엑셀 읽기 ---------- */
+const clean=v=>v==null?'':String(v).replace(/\s+/g,' ').trim();
+function won(s){ // "4억 8,000" -> 48000
+  s=String(s).replace(/[,\s]/g,'');const m=s.match(/(\d+(?:\.\d+)?)억(\d+)?/);
+  if(m)return Math.round(parseFloat(m[1])*10000)+(m[2]?+m[2]:0);
+  const n=s.match(/^\d+$/);return n?+s:0;
+}
+function parseAmount(raw,kind){
+  const s=clean(raw);let k=kind||(s.match(/매매|전세|월세/)||[''])[0];
+  const body=s.replace(/매매|전세|월세/,'').trim();
+  if(k==='월세'||/\//.test(body)){const [d,m]=body.replace(/,/g,'').split('/');return {kind:'월세',price:won(d),rent:+m||0}}
+  return {kind:k||'매매',price:won(body),rent:0};
+}
+function parseFloor(raw){
+  const s=clean(raw).replace(/층/g,'');const m=s.match(/^(\d+|고|중|저|탑|최상)\s*\/\s*(\d+)/)||s.match(/^(\d+|고|중|저)$/);
+  if(!m)return {txt:clean(raw),band:'',n:0,top:0};
+  const top=m[2]?+m[2]:0;let band,n=0;
+  if(/^\d+$/.test(m[1])){n=+m[1];band=top?(n<=Math.round(top/3)?'저':n<=Math.round(top*2/3)?'중':'고'):(n<=5?'저':n<=15?'중':'고')}
+  else band=m[1]==='탑'||m[1]==='최상'?'고':m[1];
+  return {txt:(n?n:m[1])+(top?'/'+top:'')+'층',band,n,top};
+}
+function parseType(raw){ // "82C1/59m²" -> {supply:82, ty:"C1", base:"C", area:59}
+  const s=clean(raw);const m=s.match(/(\d+)\s*([A-Za-z]*)[-\s]?(\d*)\s*\/\s*(\d+)/);
+  if(!m){const a=s.match(/(\d+)\s*m/);return {txt:s,supply:0,ty:'',base:'',area:a?+a[1]:0}}
+  const ty=(m[2]||'').toUpperCase()+(m[3]||'');
+  return {txt:s.replace(/m²|㎡/,'㎡'),supply:+m[1],ty,base:(m[2]||'').toUpperCase(),area:+m[4]};
+}
+function cxName(sheet){for(const [k,v] of CX_NAMES)if(sheet.includes(k))return v;return sheet}
+function short(n){return n.replace('프라이드시티','').replace('봉담','')}
+function fmtCell(v){if(typeof v==='number'){return String(Math.round(v*100)/100)}return clean(v)}
+function readBook(buf,name){
+  const wb=XLSX.read(buf,{type:'array'});const prev=DB?Object.fromEntries(DB.sheets.map(s=>[s.name,s.on])):{};
+  const sheets=[];
+  wb.SheetNames.forEach(sn=>{
+    const aoa=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,raw:true,defval:null});
+    const hi=aoa.findIndex(r=>r&&r.some(c=>clean(c)==='동')&&r.some(c=>clean(c)==='금액')&&r.some(c=>clean(c).startsWith('해당층')));
+    if(hi<0)return;
+    const h=aoa[hi].map(clean),col=k=>h.findIndex(x=>x.startsWith(k));
+    const C={reg:h.findIndex(x=>/등록일|^진행/.test(x)),dong:col('동'),kind:col('유형'),amt:col('금액'),type:col('타입'),fl:col('해당층'),dir:col('방향'),opt:col('옵션'),mv:col('입주'),agent:col('부동산'),etc:col('확인사항')};
+    const rows=[];
+    aoa.slice(hi+1).forEach((r,i)=>{
+      if(!r)return;const g=k=>C[k]>=0?r[C[k]]:null;
+      if(!clean(g('dong'))||!clean(g('amt')))return;
+      const a=parseAmount(g('amt'),clean(g('kind'))),t=parseType(g('type')),f=parseFloor(g('fl'));
+      rows.push({cx:cxName(sn),dong:clean(g('dong')),kind:a.kind,price:a.price,rent:a.rent,amt:clean(g('amt')),
+        type:t.txt,supply:t.supply,ty:t.ty,base:t.base,area:t.area,fl:f.txt,band:f.band,n:f.n,top:f.top,
+        dir:clean(g('dir')).replace(/\s/g,''),opt:fmtCell(g('opt')).replace(/\s*\n\s*/g,', '),optRaw:String(g('opt')??'').trim(),mv:fmtCell(g('mv')),
+        agent:String(g('agent')??'').trim(),etc:String(g('etc')??'').trim(),reg:fmtCell(g('reg')),id:sn+'#'+(hi+2+i)});
+    });
+    sheets.push({name:sn,on:sn in prev?prev[sn]:!SKIP.test(sn),rows});
+  });
+  if(!sheets.length)throw new Error('매물 표를 찾지 못했어요');
+  DB={file:name,at:new Date().toISOString(),sheets};store.set('db',DB);PICK.clear();
+}
+async function onFile(f){
+  if(!f)return;if(!window.XLSX)return toast('잠시 후 다시 올려주세요');
+  try{readBook(new Uint8Array(await f.arrayBuffer()),f.name);toast('최신 엑셀로 바꿨어요');render()}
+  catch(e){toast(e.message||'엑셀을 읽지 못했어요')}
+}
+
+/* ---------- 화면 ---------- */
+const all=()=>DB?DB.sheets.filter(s=>s.on).flatMap(s=>s.rows):[];
+const bucket=p=>{const e=Math.floor(p/10000),r=p%10000;return e+'억 '+(r<=3000?'초반':r<=6000?'중반':'후반')};
+const bOrder=b=>{const [e,w]=b.split('억 ');return +e*3+['초반','중반','후반'].indexOf(w)};
+const won2=a=>{const e=Math.floor(a/10000),r=a%10000;return (e?e+'억':'')+(r?(e?' ':'')+r.toLocaleString():'')||'0'};
+const priceTxt=r=>r.kind==='월세'?`${r.price.toLocaleString()}/${r.rent}`:won2(r.price);
+const isInv=r=>/투자|전세안고|세안고|임차인|세입자/.test(r.opt+' '+r.etc);
+const mvTxt=m=>!m?'':/입주|협의/.test(m)?m:'입주 '+m;
+const isNow=r=>/즉시|공실/.test(r.mv+' '+r.opt);
+
+function renderTop(){
+  if(!DB){$('#top').innerHTML=`<div class="drop" id="drop"><b>매물 엑셀 파일을 여기에 끌어다 놓으세요</b><span class="sm">또는 눌러서 파일 고르기 · 자이, 힐스물건 탭을 자동으로 찾아요</span></div>`;bindDrop($('#drop'));return}
+  const d=new Date(DB.at);
+  $('#top').innerHTML=`<div class="bar" id="drop"><b>${esc(DB.file)}</b><span class="sm">${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 올림</span>
+   <span class="sheets">${DB.sheets.map((s,i)=>`<label><input type="checkbox" data-sh="${i}" ${s.on?'checked':''}>${esc(s.name)} <span class="sm">${s.rows.length}</span></label>`).join('')}</span>
+   <span class="sp"></span><button class="btn dark" id="up">새 엑셀 올리기</button></div>`;
+  bindDrop($('#drop'));
+}
+function bindDrop(el){
+  el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('over')});
+  el.addEventListener('dragleave',()=>el.classList.remove('over'));
+  el.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();el.classList.remove('over');onFile(e.dataTransfer.files[0])});
+  if(el.classList.contains('drop'))el.addEventListener('click',()=>$('#file').click());
+}
+function counts(key,fn,rows){const m={};rows.forEach(r=>{const v=fn(r);if(v)m[v]=(m[v]||0)+1});return m}
+function chipRow(label,key,map,order,fmt){
+  const ks=Object.keys(map).sort(order||((a,b)=>a.localeCompare(b,'ko',{numeric:true})));
+  if(!ks.length)return '';
+  return `<div class="fr"><span>${label}</span><div class="chips">${ks.map(k=>`<button class="chip ${F[key].includes(k)?'on':''}" data-f="${key}" data-v="${esc(k)}">${esc(fmt?fmt(k):k)}<small>${map[k]}</small></button>`).join('')}${key==='fl'?`<button class="chip q" data-quick="midup">중층 이상</button>`:''}</div></div>`;
+}
+function renderFilters(){
+  const rows=all();if(!DB){$('#filters').innerHTML='';return}
+  const flOrder=(a,b)=>['저','중','고'].indexOf(a)-['저','중','고'].indexOf(b);
+  $('#filters').innerHTML=
+   chipRow('단지','cx',counts('cx',r=>r.cx,rows),null,short)+
+   chipRow('거래','kind',counts('kind',r=>r.kind,rows),(a,b)=>['매매','전세','월세'].indexOf(a)-['매매','전세','월세'].indexOf(b))+
+   chipRow('면적','py',counts('py',r=>r.area?r.area+'㎡':'',rows))+
+   chipRow('타입','ty',counts('ty',r=>r.base,rows),null,k=>k+'타입')+
+   chipRow('향','dir',counts('dir',r=>r.dir,rows))+
+   chipRow('층','fl',counts('fl',r=>r.band,rows),flOrder,k=>k+'층')+
+   chipRow('가격대','pr',counts('pr',r=>r.kind!=='월세'&&r.price?bucket(r.price):'',rows),(a,b)=>bOrder(a)-bOrder(b))+
+   `<div class="fr"><span>직접 입력</span><div class="rng"><input id="min" inputmode="decimal" placeholder="예: 4.8" value="${esc(F.min)}">억 ~ <input id="max" inputmode="decimal" placeholder="예: 5.3" value="${esc(F.max)}">억
+     <span style="width:10px"></span><input class="kw" id="kw" placeholder="옵션·메모 검색 (예: 중문, 즉시)" value="${esc(F.kw)}"></div></div>`+
+   `<div class="fr"><span>기타</span><div class="chips"><button class="chip ${F.noinv?'on':''}" data-t="noinv">투자(세안고) 빼기</button>
+     <button class="chip q" id="reset">조건 모두 지우기</button></div></div>`+
+   chipRow('동','dong',counts('dong',r=>r.dong,rows)).replace('class="fr"','class="fr dongs"');
+}
+function filtered(){
+  const mn=parseFloat(F.min)*10000||0,mx=parseFloat(F.max)*10000||0,kw=F.kw.trim();
+  let r=all().filter(x=>(!F.cx.length||F.cx.includes(x.cx))&&(!F.kind.length||F.kind.includes(x.kind))&&(!F.py.length||F.py.includes(x.area+'㎡'))
+   &&(!F.ty.length||F.ty.includes(x.base))&&(!F.dir.length||F.dir.includes(x.dir))&&(!F.fl.length||F.fl.includes(x.band))&&(!F.dong.length||F.dong.includes(x.dong))
+   &&(!F.pr.length||(x.kind!=='월세'&&F.pr.includes(bucket(x.price))))&&(!mn||x.price>=mn)&&(!mx||x.price<=mx)&&(!F.noinv||!isInv(x))
+   &&(!kw||kw.split(/\s+/).every(k=>(x.opt+' '+x.etc+' '+x.mv+' '+x.type).includes(k))));
+  const s={p:(a,b)=>a.price-b.price||a.rent-b.rent,ph:(a,b)=>b.price-a.price,f:(a,b)=>(b.n||({고:30,중:15,저:3}[b.band]||0))-(a.n||({고:30,중:15,저:3}[a.band]||0)),d:(a,b)=>a.dong.localeCompare(b.dong,'ko',{numeric:true})||a.price-b.price}[SORT];
+  return r.sort(s);
+}
+function renderResults(){
+  if(!DB){$('#results').innerHTML='';return}
+  const r=filtered();
+  const rows=r.map(x=>{const on=PICK.has(x.id);return `<tr class="${on?'sel':''}">
+   <td class="c-k"><button class="ck ${on?'on':''}" data-pick="${esc(x.id)}" aria-label="고르기">${CK}</button></td>
+   <td class="c-n"><span class="cx">${esc(short(x.cx))} ${esc(x.dong)}</span><div class="sm">${esc(x.type)}</div></td>
+   <td class="c-m">${esc(x.fl)}${x.band?` <span class="sm">(${x.band})</span>`:''}<div class="sm">${esc(x.dir)}</div></td>
+   <td class="c-p num"><span class="sm">${esc(x.kind)}</span> <span class="price">${priceTxt(x)}</span></td>
+   <td class="c-o"><div class="opt">${esc(x.opt)}</div>${isInv(x)?'<span class="tg inv">투자·세안고</span>':''}${isNow(x)?'<span class="tg now">즉시입주</span>':''}</td>
+   <td class="c-x"><div class="sm">${esc(mvTxt(x.mv))||'입주 -'}</div>${x.etc?`<div class="sm int" style="white-space:pre-line">${esc(x.etc)}</div>`:''}${x.agent?`<div class="sm int" style="white-space:pre-line">📞 ${esc(x.agent)}</div>`:''}</td></tr>`}).join('');
+  const list=CARD?r.filter(x=>PICK.has(x.id)):r;
+  $('#results').innerHTML=`<div class="resh"><h2>${r.length}건</h2><span class="sm">${PICK.size?`고른 매물 ${PICK.size}건`:'☐로 손님께 보낼 매물을 고를 수 있어요'}</span><span class="sp"></span>
+    <select id="sort" aria-label="정렬"><option value="p">가격 낮은순</option><option value="ph">가격 높은순</option><option value="f">층 높은순</option><option value="d">동 순서</option></select>
+    <button class="btn" id="pickall">보이는 매물 모두 고르기</button><button class="btn" id="cardv">${CARD?'목록으로 보기':'고른 매물 크게 보기'}</button><button class="btn dark" id="copy">카톡용 글 복사</button></div>`+
+   (CARD?(list.length?`<div class="cards">${list.map(cardHtml).join('')}</div>`:'<div class="empty">☐로 매물을 먼저 골라주세요</div>'):r.length?`<table><thead><tr><th></th><th>단지 · 동 · 타입</th><th>층 · 향</th><th class="num">가격</th><th>옵션</th><th>입주<span class="int"> · 메모</span></th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty">조건에 맞는 매물이 없어요. 조건을 하나씩 빼보세요.</div>');
+  $('#sort').value=SORT;
+}
+function render(){renderTop();renderFilters();renderResults()}
+
+function copyText(){
+  const list=filtered().filter(x=>!PICK.size||PICK.has(x.id));
+  if(!list.length)return '';
+  const by={};list.forEach(x=>(by[x.cx]=by[x.cx]||[]).push(x));
+  return Object.entries(by).map(([cx,xs])=>`[${cx}]\n`+xs.map(x=>`▪ ${x.dong} · ${x.type.replace(/㎡.*/,'㎡')} · ${x.band?x.band+'층':x.fl} · ${x.dir}\n   ${x.kind} ${priceTxt(x)}${x.mv?` · ${mvTxt(x.mv)}`:''}${x.opt?`\n   ${x.opt}`:''}`).join('\n')).join('\n\n')+
+   `\n\n${OFFICE.name} ${OFFICE.phones.join(' / ')}`;
+}
+
+/* ---------- 이벤트 ---------- */
+$('#file').addEventListener('change',e=>{onFile(e.target.files[0]);e.target.value=''});
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='up')return $('#file').click();
+  if(b.id==='bmode'){document.body.classList.toggle('brief');store.set('brief',document.body.classList.contains('brief'));return}
+  if(b.id==='cardv'){CARD=!CARD;renderResults();return}
+  if(b.dataset.f){const a=F[b.dataset.f],v=b.dataset.v,i=a.indexOf(v);i>=0?a.splice(i,1):a.push(v);renderFilters();renderResults();return}
+  if(b.dataset.quick==='midup'){F.fl=['중','고'];renderFilters();renderResults();return}
+  if(b.dataset.t){F[b.dataset.t]=!F[b.dataset.t];renderFilters();renderResults();return}
+  if(b.id==='reset'){Object.assign(F,{cx:[],kind:[],py:[],ty:[],dir:[],fl:[],pr:[],min:'',max:'',kw:'',noinv:false,dong:[]});renderFilters();renderResults();return}
+  if(b.dataset.pick){const id=b.dataset.pick;PICK.has(id)?PICK.delete(id):PICK.add(id);renderResults();return}
+  if(b.id==='pickall'){const r=filtered();const allOn=r.every(x=>PICK.has(x.id));r.forEach(x=>allOn?PICK.delete(x.id):PICK.add(x.id));renderResults();return}
+  if(b.id==='copy'){const t=copyText();if(!t)return toast('복사할 매물이 없어요');
+    try{await navigator.clipboard.writeText(t);toast(`${PICK.size||filtered().length}건을 복사했어요`)}catch(_){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove();toast('복사했어요')}}
+});
+document.addEventListener('change',e=>{
+  if(e.target.dataset.sh!==undefined){DB.sheets[+e.target.dataset.sh].on=e.target.checked;store.set('db',DB);renderFilters();renderResults()}
+  if(e.target.id==='sort'){SORT=e.target.value;renderResults()}
+});
+let tm;document.addEventListener('input',e=>{if(['min','max','kw'].includes(e.target.id)){F[e.target.id]=e.target.value;clearTimeout(tm);tm=setTimeout(renderResults,150)}});
+document.addEventListener('dragover',e=>e.preventDefault());
+document.addEventListener('drop',e=>{e.preventDefault();if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0])});
+if(store.get('brief',false))document.body.classList.add('brief');
+render();
+}
+</script>
+</body>
+</html>
