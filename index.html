@@ -144,15 +144,15 @@ tr.cx td{opacity:.45}tr.cx .price{text-decoration:line-through}
  </main>
 
  <aside class="side" id="side">
-  <div class="sh"><b>담은 곳 <span id="ncount">0</span></b><button class="chip" id="reset">비우기</button></div>
+  <div class="sh"><b>담은 거래 <span id="ncount">0</span></b><button class="chip" id="reset">비우기</button></div>
   <div class="seg" id="styles"><button data-s="card" class="on">카드</button><button data-s="list">목록</button><button data-s="dark">다크</button></div>
   <input class="ttl" id="ttl" aria-label="제목" placeholder="제목">
-  <div id="boardWrap"><div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6곳)</div></div>
+  <div id="boardWrap"><div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6건)</div></div>
   <div class="acts"><button class="pri" id="save">이미지 저장</button><button id="copy">글 복사 (카톡·블로그)</button></div>
  </aside>
 </div>
 
-<div class="mbar" id="mbar"><span>담은 곳 <b id="mcount">0</b></span><button id="mgo">그림 보기</button></div>
+<div class="mbar" id="mbar"><span>담은 거래 <b id="mcount">0</b></span><button id="mgo">그림 보기</button></div>
 <div class="toast" id="toast"></div>
 
 <section class="office"><div class="in">
@@ -191,6 +191,7 @@ const won=a=>{const e=Math.floor(a/10000),r=a%10000;return (e?e+'억':'')+(r?(e?
 const m2=ar=>Math.round(ar)+'㎡';
 const md=d=>d.slice(5).replace('-','.');
 const ymd=d=>d.slice(2).replace(/-/g,'.');
+const mdY=d=>d.slice(0,4)==String(new Date().getFullYear())?md(d):ymd(d);
 const norm=s=>s.replace(/\s/g,'').toLowerCase();
 const bucket=ar=>ar<60?'s':ar<=85?'m':'l';
 const today=new Date();const iso=d=>d.toISOString().slice(0,10);
@@ -210,12 +211,14 @@ function fillRegions(){
 }
 function notReady(){app.innerHTML=`<div class="empty"><b>데이터를 준비하고 있어요</b><br>첫 자동 수집이 끝나면 여기에 실거래가가 나타나요.</div>`}
 function badges(c,g,hi){return (hi&&!c?'<span class="b hi">신고가</span>':'')+(g?'<span class="b dir">직거래</span>':'')+(c?'<span class="b cx">해제</span>':'')}
+const keyOf=p=>[p.id,p.ar,p.d||'',p.a||''].join('|');
+const isPicked=p=>SEL.some(s=>keyOf(s)===keyOf(p));
 const isSel=id=>SEL.some(s=>s.id===id);
 function saveSel(){try{localStorage.setItem('sel',JSON.stringify(SEL))}catch(e){}$('#ncount').textContent=SEL.length;$('#mcount').textContent=SEL.length}
 function toggle(item){
-  const i=SEL.findIndex(s=>s.id===item.id);
+  const i=SEL.findIndex(s=>keyOf(s)===keyOf(item));
   if(i>=0)SEL.splice(i,1);
-  else{if(SEL.length>=MAXSEL){toast(`한 번에 ${MAXSEL}곳까지 담을 수 있어요`);return false}SEL.push(item)}
+  else{if(SEL.length>=MAXSEL){toast(`한 번에 ${MAXSEL}건까지 담을 수 있어요`);return false}SEL.push(item)}
   saveSel();renderBoard();return true;
 }
 const tabs=()=>`<div class="tabs"><button class="tab ${state.tab==='new'?'on':''}" data-tab="new">새 거래</button><button class="tab ${state.tab==='find'?'on':''}" data-tab="find">단지 찾기</button></div>`;
@@ -225,7 +228,7 @@ function renderNew(){
   const r=reg.value,from=daysAgo(state.days);
   const t=REC.t.filter(x=>x[4]>=from&&(!r||x[2]===r)&&(!state.area||bucket(x[6])===state.area)&&(!state.dir||!x[9])&&(!state.hi||(x[10]&&!x[8])));
   const ch=(k,v,l)=>`<button class="chip ${state[k]===v?'on':''}" data-k="${k}" data-v="${v}">${l}</button>`;
-  const rows=t.slice(0,state.shown).map(x=>{const pct=x[11]&&!x[8]?x[5]/x[11]*100:0;const s=isSel(x[0]);
+  const rows=t.slice(0,state.shown).map(x=>{const pct=x[11]&&!x[8]?x[5]/x[11]*100:0;const s=isPicked({id:x[0],ar:Math.round(x[6]),d:x[4],a:x[5]});
    return `<tr class="${x[8]?'cx':''} ${s?'sel':''}">
    <td class="c-k">${x[8]?'':`<button class="ck ${s?'on':''}" data-pick='${esc(JSON.stringify({id:x[0],ar:Math.round(x[6]),d:x[4],a:x[5]}))}' aria-label="담기">${CK}</button>`}</td>
    <td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a>${badges(x[8],x[9],x[10])}<div class="sm">${esc(x[2].replace('서울 ','').replace('화성시 ',''))} ${esc(x[3])} · ${m2(x[6])} · ${x[7]}층</div></td>
@@ -244,7 +247,7 @@ async function renderFind(){
   try{await loadIndex()}catch(e){return notReady()}
   const k=norm(q.value),r=reg.value;
   const c=IDX.c.filter(x=>(!r||x[2]===r)&&(!k||norm(x[1]).includes(k)||norm(x[3]).includes(k)));
-  const rows=c.slice(0,state.shown).map(x=>{const s=isSel(x[0]);return `<tr class="${s?'sel':''}">
+  const rows=c.slice(0,state.shown).map(x=>{const s=isPicked({id:x[0],ar:Math.round(x[7])});return `<tr class="${s?'sel':''}">
    <td class="c-k"><button class="ck ${s?'on':''}" data-pick='${esc(JSON.stringify({id:x[0],ar:Math.round(x[7])}))}' aria-label="담기">${CK}</button></td>
    <td class="c-n"><a class="nm" href="#c${esc(x[0])}">${esc(x[1])}</a><div class="sm">${esc(x[2])} ${esc(x[3])} · 거래 ${x[4]}건</div></td>
    <td class="num sm hide-m">최근 ${ymd(x[5])}</td><td class="num c-p"><span class="price">${won(x[6])}</span><div class="sm">${m2(x[7])}</div></td></tr>`}).join('');
@@ -270,13 +273,14 @@ async function renderDetail(id){
 function drawArea(){
   const a=CX.sel,ts=CX.t.filter(t=>Math.round(t[2])===a),ok=ts.filter(t=>!t[5]);
   document.querySelectorAll('#areas .chip').forEach(b=>b.classList.toggle('on',+b.dataset.ar===a));
-  $('#addcx').textContent=isSel(CX.id)?'✓ 담김 (빼기)':'+ 보드에 담기';
-  const last=ok[0],max=ok.reduce((m,t)=>t[1]>m[1]?t:m,ok[0]||ts[0]);
+  const last=ok[0];CX.last=last?{id:CX.id,ar:a,d:last[0],a:last[1]}:null;
+  $('#addcx').textContent=CX.last&&isPicked(CX.last)?`✓ ${a}㎡ 최근 거래 담김`:`+ ${a}㎡ 최근 거래 담기`;
+  const _l=0,max=ok.reduce((m,t)=>t[1]>m[1]?t:m,ok[0]||ts[0]);
   $('#stats').innerHTML=`<div class="st"><small>최근 거래가</small><b>${last?won(last[1]):'-'}</b><div class="sm">${last?ymd(last[0])+' · '+last[3]+'층':''}</div></div>
    <div class="st"><small>수집 기간 최고가</small><b>${max?won(max[1]):'-'}</b><div class="sm">${max?ymd(max[0]):''}</div></div>
    <div class="st"><small>거래 건수</small><b>${ts.length}건</b><div class="sm">해제 ${ts.length-ok.length}건 포함</div></div>`;
-  $('#trades').innerHTML=`<table><thead><tr><th>계약일</th><th>면적</th><th class="num">층</th><th class="hide-m">동</th><th class="num">거래가</th></tr></thead><tbody>${ts.map(t=>`<tr class="${t[5]?'cx':''}">
-   <td>${ymd(t[0])}${badges(t[5],t[6],t[7])}</td><td>${m2(t[2])}</td><td class="num">${t[3]}층</td><td class="hide-m sm">${esc(t[4])||'-'}</td><td class="num"><span class="price">${won(t[1])}</span></td></tr>`).join('')}</tbody></table>`;
+  $('#trades').innerHTML=`<p class="sm" style="margin:0 0 6px">☐를 눌러 원하는 거래를 골라 담을 수 있어요. 다른 달 거래나 다른 평형도 섞어서 담아보세요.</p><table><thead><tr><th></th><th>계약일</th><th>면적</th><th class="num">층</th><th class="hide-m">동</th><th class="num">거래가</th></tr></thead><tbody>${ts.map(t=>{const pk={id:CX.id,ar:a,d:t[0],a:t[1]},on=!t[5]&&isPicked(pk);return `<tr class="${t[5]?'cx':''} ${on?'sel':''}">
+   <td style="width:40px">${t[5]?'':`<button class="ck ${on?'on':''}" data-pick='${esc(JSON.stringify(pk))}' aria-label="담기">${CK}</button>`}</td><td>${ymd(t[0])}${badges(t[5],t[6],t[7])}</td><td>${m2(t[2])}</td><td class="num">${t[3]}층</td><td class="hide-m sm">${esc(t[4])||'-'}</td><td class="num"><span class="price">${won(t[1])}</span></td></tr>`}).join('')}</tbody></table>`;
   chart(ok.slice().reverse());
 }
 function chart(pts){
@@ -317,13 +321,14 @@ function spark(sp,dark){
 }
 function autoTitle(list){
   const rs=[...new Set(list.map(x=>x.cx.r))];
-  return `${rs.length===1?rs[0]:'아파트 실거래'} ${list.length}곳 한눈에`;
+  const n=new Set(list.map(x=>x.cx.id)).size;
+  return `${rs.length===1?rs[0]:'아파트 실거래'} ${n===list.length?n+'곳 한눈에':n+'곳 실거래 '+list.length+'건'}`;
 }
 let LAST=[];
 async function renderBoard(){
   saveSel();
   const wrap=$('#boardWrap');
-  if(!SEL.length){LAST=[];wrap.innerHTML='<div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6곳)</div>';$('#ttl').value='';return}
+  if(!SEL.length){LAST=[];wrap.innerHTML='<div class="hint">왼쪽 목록에서 ☐를 눌러 단지를 담으면<br>여기에 한눈에 보는 그림이 만들어져요 (최대 6건)</div>';$('#ttl').value='';return}
   let list=[];
   for(const it of SEL){try{const s=summarize(await getCx(it.id),it);if(s)list.push(s)}catch(e){}}
   LAST=list;
@@ -334,21 +339,21 @@ async function renderBoard(){
   const up=s=>s.prevMax&&s.cur[1]>s.prevMax?`<span class="bup">▲${(s.cur[1]-s.prevMax).toLocaleString()} 신고가</span>`:'';
   const body=state.style==='card'
    ?`<div class="bgrid">${list.map(s=>`<div class="bc"><div class="bn">${esc(s.cx.n)}</div><div class="bm">${meta(s)}</div>
-      <div class="bp">${won(s.cur[1])}</div><div class="bs">${s.key}㎡ · ${s.cur[3]}층 · ${md(s.cur[0])} 계약 ${up(s)}</div>${spark(s.spark,false)}
+      <div class="bp">${won(s.cur[1])}</div><div class="bs">${s.key}㎡ · ${s.cur[3]}층 · ${mdY(s.cur[0])} 계약 ${up(s)}</div>${spark(s.spark,false)}
       <div class="bx"><div><small>최고가</small><b>${won(s.max[1])}</b></div><div><small>최고가 대비</small><b>${(s.cur[1]/s.max[1]*100).toFixed(1)}%</b></div><div><small>석 달 거래</small><b>${s.cnt3}건</b></div></div></div>`).join('')}</div>`
-   :`<div class="blist">${list.map(s=>`<div class="br"><div><div class="bn">${esc(s.cx.n)}</div><div class="bm">${meta(s)} · ${s.key}㎡ · ${s.cur[3]}층 · ${md(s.cur[0])} 계약</div></div><div><div class="bp">${won(s.cur[1])}</div><div style="text-align:right">${up(s)||`<span class="bm">최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%</span>`}</div></div></div>`).join('')}</div>`;
+   :`<div class="blist">${list.map(s=>`<div class="br"><div><div class="bn">${esc(s.cx.n)}</div><div class="bm">${meta(s)} · ${s.key}㎡ · ${s.cur[3]}층 · ${mdY(s.cur[0])} 계약</div></div><div><div class="bp">${won(s.cur[1])}</div><div style="text-align:right">${up(s)||`<span class="bm">최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%</span>`}</div></div></div>`).join('')}</div>`;
   wrap.innerHTML=`<div id="board" class="${dark?'dark':''}"><div class="bt"><div><span class="tag" style="${dark?'color:#1C1C1E':''}">아파트 실거래가</span><h3>${esc(title)}</h3></div><div class="dt">${dt}<br><span style="font-weight:500;opacity:.7">기준</span></div></div>
    ${body}
    <div class="bf"><div class="of">${esc(CONFIG.office)} · ${esc(CONFIG.owner)}<small>${esc(CONFIG.site.replace('https://',''))}</small></div><div class="tel">${CONFIG.phones.map(esc).join('<br>')}</div></div></div>`;
   // 목록 체크 표시 갱신
-  document.querySelectorAll('[data-pick]').forEach(b=>{const id=JSON.parse(b.dataset.pick).id,s=isSel(id);b.classList.toggle('on',s);b.closest('tr')?.classList.toggle('sel',s)});
-  if($('#addcx')&&CX)$('#addcx').textContent=isSel(CX.id)?'✓ 담김 (빼기)':'+ 보드에 담기';
+  document.querySelectorAll('[data-pick]').forEach(b=>{const s=isPicked(JSON.parse(b.dataset.pick));b.classList.toggle('on',s);b.closest('tr')?.classList.toggle('sel',s)});
+  if($('#addcx')&&CX&&CX.last)$('#addcx').textContent=isPicked(CX.last)?`✓ ${CX.sel}㎡ 최근 거래 담김`:`+ ${CX.sel}㎡ 최근 거래 담기`;
 }
 function boardText(){
   if(!LAST.length)return '';
   const d=new Date();
   return `[${$('#ttl').value}] ${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()} 기준\n\n`+
-   LAST.map(s=>`▪ ${s.cx.n} ${s.key}㎡ ${s.cur[3]}층\n   ${won(s.cur[1])} (${md(s.cur[0])} 계약${s.prevMax&&s.cur[1]>s.prevMax?', 신고가':''}) · 최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%`).join('\n')+
+   LAST.map(s=>`▪ ${s.cx.n} ${s.key}㎡ ${s.cur[3]}층\n   ${won(s.cur[1])} (${mdY(s.cur[0])} 계약${s.prevMax&&s.cur[1]>s.prevMax?', 신고가':''}) · 최고가 대비 ${(s.cur[1]/s.max[1]*100).toFixed(1)}%`).join('\n')+
    `\n\n${CONFIG.office} ${CONFIG.phones.join(' / ')}\n실거래가 검색: ${CONFIG.site}`;
 }
 $('#copy').addEventListener('click',async()=>{
@@ -396,7 +401,7 @@ app.addEventListener('click',e=>{
   else if(b.dataset.t){state[b.dataset.t]=!state[b.dataset.t];state.shown=60;renderNew()}
   else if(b.id==='more'){state.shown+=60;state.tab==='find'||q.value.trim()?renderFind():renderNew()}
   else if(b.id==='back'){history.length>1?history.back():(location.hash='')}
-  else if(b.id==='addcx'){toggle({id:CX.id,ar:CX.sel})}
+  else if(b.id==='addcx'){if(CX.last)toggle(CX.last)}
   else if(b.dataset.ar){CX.sel=+b.dataset.ar;drawArea()}
 });
 window.addEventListener('hashchange',route);
