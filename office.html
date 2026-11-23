@@ -107,11 +107,13 @@ body.brief .bmode{background:var(--ink);color:var(--y)}
 .pcard .pp small{font-size:10pt;margin-right:1.5mm}
 .pcard table{width:100%;border-collapse:collapse;margin:0}
 .pcard td{font-size:9.5pt;padding:1.2mm 0;border-bottom:.3mm solid #ddd;vertical-align:top;display:table-cell}
-.pcard td:first-child{width:16mm;color:#666;font-weight:700}
+.pcard td:first-child{width:17mm;color:#666;font-weight:700}
 .pcard>div:last-child{display:flex;flex-direction:column;min-height:0}
-.pcard .memo{margin-top:3mm;font-size:9pt;flex:1;display:flex;flex-direction:column;justify-content:space-evenly}
-.pcard .memo div{border-bottom:.3mm solid #999;height:9mm;display:flex;align-items:flex-end;color:#888}
-.pcard .pf{font-size:8.5pt;color:#555;margin-top:2mm;display:flex;justify-content:space-between}
+.pcard .memo{margin-top:3mm;font-size:9pt;flex:1;display:flex;flex-direction:column;min-height:0}
+.pcard .memo b{font-size:9.5pt;color:#666}
+.pcard .memo div{border-bottom:.3mm solid #aaa;flex:1;max-height:9mm;min-height:6mm}
+.pcard .pf{font-size:9pt;color:#333;margin-top:2.5mm;display:flex;justify-content:space-between;align-items:flex-end;gap:3mm;font-weight:700}
+.pcard .pf .tels{display:flex;flex-direction:column;align-items:flex-end;white-space:nowrap;line-height:1.35}
 @media(max-width:760px){
  thead{display:none}
  table,tbody,tr,td{display:block}
@@ -207,9 +209,9 @@ function printCards(){
   const brief=document.body.classList.contains('brief');const d=new Date(),ds=`${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
   $('#printArea').innerHTML=list.map(x=>{const u=planFor(x);return `<div class="pcard"><div class="pl"><div class="ph"><span>리치부동산 임장카드</span><span>${ds}</span></div>${u?`<img src="${u}" alt="">`:'<div class="none">도면 없음</div>'}</div>
    <div><div class="pn">${esc(x.cx)}</div><div class="pd">${esc(x.dong)} · ${esc(x.type.replace(/㎡.*/,'㎡'))}</div><div class="pp"><small>${esc(x.kind)}</small>${priceTxt(x)}</div>
-   <table><tr><td>층</td><td>${brief?(x.band?x.band+'층':esc(x.fl)):esc(x.fl)+(x.band?' ('+x.band+')':'')}</td></tr><tr><td>향</td><td>${esc(x.dir)}</td></tr><tr><td>입주</td><td>${esc(mvTxt(x.mv))||'-'}</td></tr><tr><td>옵션</td><td>${esc(x.opt)||'-'}</td></tr>${!brief&&x.etc?`<tr><td>메모</td><td style="white-space:pre-line">${esc(x.etc)}</td></tr>`:''}</table>
-   <div class="memo"><div>뷰 · 채광</div><div>집 상태</div><div>소음 · 기타</div></div>
-   <div class="pf"><span>${esc(OFFICE.name)}</span><span>${OFFICE.phones.map(esc).join(' · ')}</span></div></div></div>`}).join('');
+   <table><tr><td>층</td><td>${brief?(x.band?x.band+'층':esc(x.fl)):esc(x.fl)+(x.band?' ('+x.band+')':'')}</td></tr><tr><td>향</td><td>${esc(x.dir)}</td></tr><tr><td>입주</td><td>${esc(mvTxt(x.mv))||'-'}</td></tr><tr><td>옵션</td><td>${esc(x.opt)||'-'}</td></tr>${!brief&&x.etc?`<tr><td>확인사항</td><td style="white-space:pre-line">${esc(x.etc)}</td></tr>`:''}</table>
+   <div class="memo"><b>메모</b><div></div><div></div><div></div><div></div><div></div></div>
+   <div class="pf"><span>${esc(OFFICE.name)}</span><span class="tels">${OFFICE.phones.map(p=>`<span>${esc(p)}</span>`).join('')}</span></div></div></div>`}).join('');
   const imgs=[...$('#printArea').querySelectorAll('img')];
   Promise.all(imgs.map(i=>i.complete?1:new Promise(r=>{i.onload=i.onerror=r}))).then(()=>{try{window.print()}catch(e){toast('인쇄 창을 열지 못했어요')}});
 }
